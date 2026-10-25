@@ -7,12 +7,13 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+from pydantic import SecretStr
 from fastapi.testclient import TestClient
 
 from app import arxiv, cli, main
 from app import llm as llm_mod
 from app.answer import ask
-from app.config import settings
+from app.config import Settings, settings
 from app.llm import AnthropicLLM, LLMError, LLMRefusal, LLMTransient, LLMUnavailable, RawAnswer, RawCitation
 from tests.test_answer import FakeLLM, make_corpus
 
@@ -301,3 +302,88 @@ def test_refusal_body_is_typed(monkeypatch):
     r = client(RaisingLLM(LLMRefusal("x")), monkeypatch).post("/api/ask", json={"question": "widgets"})
     assert r.status_code == 422
     assert r.json() == {"error": "refused", "detail": "The model declined to answer this question."}
+
+
+# ---------- access control on /api/ask ----------
+
+def _ask(c, **kw):
+    return c.post("/api/ask", json={"question": "widgets hum"}, **kw)
+
+
+def test_unlisted_host_is_rejected(monkeypatch):
+    make_corpus()
+    c = client(good_llm(), monkeypatch)
+    for path in ("/", "/api/papers"):
+        assert c.get(path, headers={"host": "evil.example"}).status_code == 400
+    assert _ask(c, headers={"host": "evil.example:8000"}).status_code == 400
+    assert _ask(c).status_code == 200
+
+
+@pytest.mark.parametrize("host", ["localhost:8000", "127.0.0.1:8000", "[::1]:8000"])
+def test_default_local_hosts_are_accepted(monkeypatch, host):
+    make_corpus()
+    monkeypatch.setattr(settings, "allowed_hosts", Settings(_env_file=None).allowed_hosts)
+    assert _ask(client(good_llm(), monkeypatch), headers={"host": host}).status_code == 200
+
+
+def test_allowed_hosts_env_is_comma_separated(monkeypatch):
+    monkeypatch.setenv("ALLOWED_HOSTS", "a.example, b.example,")
+    assert Settings(_env_file=None).allowed_hosts == ["a.example", "b.example"]
+
+
+def test_cross_origin_request_is_rejected(monkeypatch):
+    make_corpus()
+    c = client(good_llm(), monkeypatch)
+    for origin in ("http://evil.example", "https://testserver", "http://testserver:9999", "null"):
+        r = _ask(c, headers={"origin": origin})
+        assert r.status_code == 403, origin
+    assert _ask(c, headers={"origin": "http://testserver"}).status_code == 200
+    assert _ask(c).status_code == 200  # no Origin header: curl, the CLI, tests
+
+
+def test_ask_requires_json_content_type(monkeypatch):
+    make_corpus()
+    c = client(good_llm(), monkeypatch)
+    r = c.post("/api/ask", content='{"question": "widgets hum"}', headers={"content-type": "text/plain"})
+    assert r.status_code == 422
+    r = c.post("/api/ask", data={"question": "widgets hum"})  # form-encoded, as a cross-site <form> would send
+    assert r.status_code == 422
+
+
+def test_api_token_required_when_configured(monkeypatch):
+    make_corpus()
+    monkeypatch.setattr(settings, "api_token", SecretStr("s3cret-token"))
+    c = client(good_llm(), monkeypatch)
+    missing, wrong = _ask(c), _ask(c, headers={"X-API-Token": "nope"})
+    assert missing.status_code == 401 and wrong.status_code == 401
+    assert "s3cret-token" not in missing.text + wrong.text and "nope" not in wrong.text
+    assert _ask(c, headers={"X-API-Token": "café".encode()}).status_code == 401  # non-ASCII must not crash
+    assert _ask(c, headers={"X-API-Token": "s3cret-token"}).status_code == 200
+    assert c.get("/api/papers").status_code == 200  # only /api/ask is guarded
+
+
+def test_token_check_comes_before_the_model_is_called(monkeypatch):
+    make_corpus()
+    monkeypatch.setattr(settings, "api_token", SecretStr("t"))
+    llm = good_llm()
+    c = client(llm, monkeypatch)
+    assert _ask(c).status_code == 401
+    assert _ask(c, headers={"origin": "http://evil.example", "X-API-Token": "t"}).status_code == 403
+    assert not llm.calls if hasattr(llm, "calls") else True
+
+
+def test_no_token_configured_local_requests_work(monkeypatch):
+    make_corpus()
+    assert settings.api_token is None
+    assert _ask(client(good_llm(), monkeypatch)).status_code == 200
+
+
+def test_empty_api_token_means_none(monkeypatch):
+    monkeypatch.setenv("API_TOKEN", "")
+    assert Settings(_env_file=None).api_token is None
+
+
+def test_page_sends_token_from_session_storage_not_url():
+    html = (Path(main.STATIC) / "index.html").read_text(encoding="utf-8")
+    assert "X-API-Token" in html and "sessionStorage" in html
+    assert "localStorage" not in html and "location" not in html
