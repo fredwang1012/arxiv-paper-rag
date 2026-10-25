@@ -270,7 +270,7 @@ def _braced(text: str, pos: int) -> tuple[str, int]:
     return text[pos + 1:], len(text)
 
 
-_HEADING = re.compile(r"\\(section|subsection|subsubsection)(\*?)\s*(?:" + _OPT + r")?\s*(?=\{)|\\appendix\b")
+_HEADING = re.compile(r"\\(section|subsection|subsubsection)(\*?)(?:\s*" + _OPT + r")?\s*(?=\{)|\\appendix\b")
 
 
 def _number(counters: list[int], level: int, appendix: bool) -> str:
@@ -321,7 +321,7 @@ _MATH_DOLLARS = re.compile(r"\$\$.+?\$\$|(?<!\\)\$.+?(?<!\\)\$", re.S)
 _FLOAT_OPEN = re.compile(r"\\begin\{((?:figure|table|wrapfigure|wraptable|sidewaysfigure|sidewaystable)\*?)\}")
 _FORMATTING = ("textbf|textit|emph|texttt|textsc|textrm|textsf|textsl|textup|underline|mbox|footnote|footnotetext"
                "|url|texorpdfstring|textnormal|uppercase|lowercase|centerline|paragraph|subparagraph")
-_CITE = r"\\(?:cite[a-zA-Z]*|nocite|parencite|textcite)\*?\s*(?:" + _OPT + r"\s*){0,4}\{[^{}]*\}"
+_CITE = r"\\(?:cite[a-zA-Z]*|nocite|parencite|textcite)\*?(?:\s*" + _OPT + r"){0,4}\s*\{[^{}]*\}"
 _REF = r"\\(?:ref|eqref|autoref|cref|Cref|pageref|nameref|vref)\*?\s*\{[^{}]*\}"
 
 
@@ -337,7 +337,7 @@ def _math_closer(m: re.Match) -> str:
 def _captions(m: re.Match, inner: str) -> str:
     """Keep only the \\caption{} text of a figure or table environment."""
     out, pos = [], 0
-    for c in re.finditer(r"\\caption\*?\s*(?:" + _OPT_ML + r")?\s*(?=\{)", inner):
+    for c in re.finditer(r"\\caption\*?(?:\s*" + _OPT_ML + r")?\s*(?=\{)", inner):
         if c.start() < pos:
             continue
         cap, pos = _braced(inner, c.end())
