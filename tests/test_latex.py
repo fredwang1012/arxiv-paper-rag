@@ -233,3 +233,27 @@ def test_latin1_source_is_decoded(tmp_path):
     s = latex_sections(make_tar(tmp_path, {"a.tex": doc(body).encode("latin-1")}))
     assert s[0][0] == ["1 Caf\xe9"]
     assert s[0][1].startswith("na\xefve r\xe9sum\xe9")
+
+
+def _parses_fast(tmp_path, body):
+    start = time.monotonic()
+    latex_sections(make_tar(tmp_path, {"a.tex": doc(body)}))
+    assert time.monotonic() - start < 1
+
+
+def test_unclosed_abstract_repeated_is_fast(tmp_path):
+    _parses_fast(tmp_path, "\\section{S}\n" + "\\begin{abstract} words " * 10000)
+
+
+def test_unclosed_section_option_repeated_is_fast(tmp_path):
+    _parses_fast(tmp_path, "\\section[ " * 20000)
+
+
+def test_unclosed_cite_option_repeated_is_fast(tmp_path):
+    _parses_fast(tmp_path, "\\section{S}\n" + "\\cite[ " * 30000)
+
+
+def test_abstract_ends_at_first_closer_after_opener(tmp_path):
+    s = by_path(latex_sections(make_tar(tmp_path, {"a.tex": doc(
+        "\\end{abstract} stray \\begin{abstract} real text \\end{abstract}\n\\section{S}\nbody")})))
+    assert s["Abstract"] == "real text"
