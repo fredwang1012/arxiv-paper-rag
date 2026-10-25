@@ -257,3 +257,8 @@ def test_abstract_ends_at_first_closer_after_opener(tmp_path):
     s = by_path(latex_sections(make_tar(tmp_path, {"a.tex": doc(
         "\\end{abstract} stray \\begin{abstract} real text \\end{abstract}\n\\section{S}\nbody")})))
     assert s["Abstract"] == "real text"
+
+
+def test_heading_and_caption_followed_by_long_whitespace_are_fast(tmp_path):
+    _parses_fast(tmp_path, ("\\section" + " " * 200_000 + "\n") + "\\begin{figure}\\caption" + " " * 200_000
+                 + "\\end{figure}\n\\cite" + " " * 200_000)
