@@ -22,6 +22,9 @@ MAX_SECTION_CHARS = 2_000_000
 MAX_UNWRAP_PASSES = 20
 _LEVELS = {"section": 0, "subsection": 1, "subsubsection": 2}
 _PREFERRED_MAIN = ("main.tex", "ms.tex")
+# an optional [...] argument: bounded and single-line, so an unclosed "[" cannot make a pattern scan far
+_OPT = r"\[[^\]\n]{0,200}\]"
+_OPT_ML = r"\[[^\]]{0,200}\]"  # may span lines, e.g. \begin{itemize}[...] settings; still bounded
 
 
 # ---------- reading the source ----------
@@ -267,7 +270,7 @@ def _braced(text: str, pos: int) -> tuple[str, int]:
     return text[pos + 1:], len(text)
 
 
-_HEADING = re.compile(r"\\(section|subsection|subsubsection)(\*?)\s*(?:\[[^\]]*\])?\s*(?=\{)|\\appendix\b")
+_HEADING = re.compile(r"\\(section|subsection|subsubsection)(\*?)\s*(?:" + _OPT + r")?\s*(?=\{)|\\appendix\b")
 
 
 def _number(counters: list[int], level: int, appendix: bool) -> str:
@@ -318,7 +321,7 @@ _MATH_DOLLARS = re.compile(r"\$\$.+?\$\$|(?<!\\)\$.+?(?<!\\)\$", re.S)
 _FLOAT_OPEN = re.compile(r"\\begin\{((?:figure|table|wrapfigure|wraptable|sidewaysfigure|sidewaystable)\*?)\}")
 _FORMATTING = ("textbf|textit|emph|texttt|textsc|textrm|textsf|textsl|textup|underline|mbox|footnote|footnotetext"
                "|url|texorpdfstring|textnormal|uppercase|lowercase|centerline|paragraph|subparagraph")
-_CITE = r"\\(?:cite[a-zA-Z]*|nocite|parencite|textcite)\*?\s*(?:\[[^\]]*\]\s*)*\{[^{}]*\}"
+_CITE = r"\\(?:cite[a-zA-Z]*|nocite|parencite|textcite)\*?\s*(?:" + _OPT + r"\s*){0,4}\{[^{}]*\}"
 _REF = r"\\(?:ref|eqref|autoref|cref|Cref|pageref|nameref|vref)\*?\s*\{[^{}]*\}"
 
 
@@ -334,7 +337,7 @@ def _math_closer(m: re.Match) -> str:
 def _captions(m: re.Match, inner: str) -> str:
     """Keep only the \\caption{} text of a figure or table environment."""
     out, pos = [], 0
-    for c in re.finditer(r"\\caption\*?\s*(?:\[[^\]]*\])?\s*(?=\{)", inner):
+    for c in re.finditer(r"\\caption\*?\s*(?:" + _OPT_ML + r")?\s*(?=\{)", inner):
         if c.start() < pos:
             continue
         cap, pos = _braced(inner, c.end())
@@ -367,8 +370,8 @@ def clean_text(raw: str) -> str:
             break
         text = new
     text = re.sub(r"\\(?:vspace|hspace|vskip|hskip)\*?\s*\{[^{}]*\}", " ", text)
-    text = re.sub(r"\\item\b\s*(?:\[[^\]]*\])?", "\n- ", text)
-    text = re.sub(r"\\(?:begin|end)\s*\{[^{}]*\}(?:\[[^\]]*\])?", " ", text)
+    text = re.sub(r"\\item\b\s*(?:" + _OPT_ML + r")?", "\n- ", text)
+    text = re.sub(r"\\(?:begin|end)\s*\{[^{}]*\}(?:" + _OPT_ML + r")?", " ", text)
     text = text.replace("\\\\", " ").replace("~", " ").replace("``", '"').replace("''", '"')
     text = re.sub(r"\\([%&_#$])", r"\1", text)
     text = re.sub(r"\\([{}])", r"\1", text).replace("{", "").replace("}", "")
@@ -377,6 +380,18 @@ def clean_text(raw: str) -> str:
 
 
 # ---------- entry point ----------
+
+_ABS_OPEN, _ABS_CLOSE = "\\begin{abstract}", "\\end{abstract}"
+
+
+def _abstract_span(body: str) -> tuple[int, int] | None:
+    """(start of the opener, start of the closer) of the first \\begin{abstract} that has a closer, else None.
+    Linear: each marker is searched forward only, and a missing closer ends the search."""
+    start = body.find(_ABS_OPEN)
+    if start < 0:
+        return None
+    close = body.find(_ABS_CLOSE, start + len(_ABS_OPEN))
+    return (start, close) if close >= 0 else None
 
 def latex_sections(folder: Path) -> list[tuple[list[str], str]]:
     """(path, text) for each non-empty section; empty when the paper has no usable LaTeX source."""
@@ -387,10 +402,10 @@ def latex_sections(folder: Path) -> list[tuple[list[str], str]]:
     body = _body(_expand_macros(found[1]))
 
     sections: list[tuple[list[str], str]] = []
-    abstract = re.search(r"\\begin\{abstract\}(.*?)\\end\{abstract\}", body, re.S)
+    abstract = _abstract_span(body)
     if abstract:
-        sections.append((["Abstract"], clean_text(abstract.group(1))))
-        body = body[:abstract.start()] + body[abstract.end():]
+        sections.append((["Abstract"], clean_text(body[abstract[0] + len(_ABS_OPEN):abstract[1]])))
+        body = body[:abstract[0]] + body[abstract[1] + len(_ABS_CLOSE):]
     for i, (path, raw) in enumerate(_split(body)):
         text = clean_text(raw[:MAX_SECTION_CHARS])
         if i == 0 and "\\" in text:  # title/author blocks and publisher macros, not prose
