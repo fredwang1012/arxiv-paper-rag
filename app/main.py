@@ -1,20 +1,40 @@
 """The web app: a JSON API over the reading list and a single static page."""
+import secrets
 import threading
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel, Field
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from app import corpus as corpus_mod
 from app.answer import Answer, ask
+from app.config import settings
 from app.corpus import Corpus
 from app.llm import LLM, AnthropicLLM, LLMError, LLMRefusal, LLMTransient, LLMUnavailable, error_message
 
 STATIC = Path(__file__).parent / "static"
 
 app = FastAPI(title="arxiv-paper-rag")
+
+
+class _SettingsHosts(TrustedHostMiddleware):
+    """TrustedHostMiddleware whose allowed hosts follow settings.allowed_hosts at request time, not import time."""
+
+    def __init__(self, app, **kwargs) -> None:
+        super().__init__(app, allowed_hosts=settings.allowed_hosts, **kwargs)
+        self._hosts = tuple(settings.allowed_hosts)
+
+    async def __call__(self, scope, receive, send) -> None:
+        if tuple(settings.allowed_hosts) != self._hosts:
+            self.__init__(self.app, www_redirect=self.www_redirect)
+        await super().__call__(scope, receive, send)
+
+
+# a DNS-rebinding page reaches this server under its own hostname; refuse any Host that is not listed
+app.add_middleware(_SettingsHosts)
 _lock = threading.Lock()
 _corpus: Corpus | None = None
 _llm: LLM | None = None
@@ -69,7 +89,32 @@ def papers() -> list[dict]:
             for m in c.metas.values()]
 
 
-@app.post("/api/ask")
+_DEFAULT_PORTS = {"http": ":80", "https": ":443"}
+
+
+def _origin_key(scheme: str, netloc: str) -> str:
+    netloc = netloc.lower()
+    default = _DEFAULT_PORTS.get(scheme)
+    if default and netloc.endswith(default):
+        netloc = netloc[:-len(default)]
+    return f"{scheme}://{netloc}"
+
+
+def guard_ask(request: Request, x_api_token: str | None = Header(default=None)) -> None:
+    """Refuse cross-site browser requests, then require the shared token when one is configured."""
+    origin = request.headers.get("origin")
+    if origin is not None:
+        scheme, sep, netloc = origin.partition("://")
+        same = sep and _origin_key(scheme.lower(), netloc) == _origin_key(request.url.scheme, request.headers.get("host", ""))
+        if not same:
+            raise HTTPException(403, "Cross-origin requests are not allowed.")
+    if settings.api_token is not None:
+        expected = settings.api_token.get_secret_value().encode()
+        if x_api_token is None or not secrets.compare_digest(x_api_token.encode(), expected):
+            raise HTTPException(401, "A valid X-API-Token header is required.")
+
+
+@app.post("/api/ask", dependencies=[Depends(guard_ask)])
 def ask_endpoint(req: AskRequest) -> dict:
     try:
         return answer_json(ask(req.question, get_corpus(), get_llm(), req.k))

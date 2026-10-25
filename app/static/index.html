@@ -22,6 +22,9 @@
   p.sub { color: var(--muted); margin: 0 0 20px; }
   textarea { width: 100%; min-height: 84px; padding: 10px; font: inherit; color: var(--fg);
     background: var(--card); border: 1px solid var(--border); border-radius: 6px; resize: vertical; }
+  label.token { display: block; margin-top: 8px; color: var(--muted); font-size: .9rem; }
+  input#token { display: block; width: 100%; max-width: 320px; margin-top: 2px; padding: 6px 8px; font: inherit;
+    color: var(--fg); background: var(--card); border: 1px solid var(--border); border-radius: 6px; }
   button { margin-top: 8px; padding: 8px 16px; font: inherit; color: var(--on-accent); background: var(--accent);
     border: 0; border-radius: 6px; cursor: pointer; }
   button:disabled { opacity: .6; cursor: default; }
@@ -46,6 +49,9 @@
   <p class="sub">Ask about the CSC2626 Week 5 papers. Every claim cites its paper and section.</p>
   <form id="form">
     <textarea id="q" maxlength="1000" required placeholder="How does the NPI core decide when to stop?"></textarea>
+    <label class="token">API token (only if the server requires one)
+      <input id="token" type="password" autocomplete="off" spellcheck="false">
+    </label>
     <button id="go" type="submit">Ask</button>
   </form>
   <div id="status" role="status"></div>
@@ -108,17 +114,26 @@ function render(data) {
   $("result").hidden = false;
 }
 
+// The token lives in sessionStorage only (this tab, never the URL); storage can be blocked, so every access is guarded.
+try { $("token").value = sessionStorage.getItem("apiToken") || ""; } catch (e) { /* storage unavailable */ }
+
 $("form").addEventListener("submit", async (ev) => {
   ev.preventDefault();
   const question = $("q").value.trim();
   if (!question) return;
+  const token = $("token").value.trim();
+  try {
+    if (token) sessionStorage.setItem("apiToken", token); else sessionStorage.removeItem("apiToken");
+  } catch (e) { /* storage unavailable */ }
+  const headers = { "Content-Type": "application/json" };
+  if (token) headers["X-API-Token"] = token;
   $("go").disabled = true;
   $("result").hidden = true;
   $("status").className = "";
   $("status").textContent = "Thinking...";
   try {
     const res = await fetch("/api/ask", {
-      method: "POST", headers: { "Content-Type": "application/json" },
+      method: "POST", headers,
       body: JSON.stringify({ question }),
     });
     const body = await res.json().catch(() => ({}));

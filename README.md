@@ -40,8 +40,15 @@ unreachable or throttling it prints one line and exits with status 1, keeping wh
 For the web page and API:
 
 ```bash
-py -3.12 -m uv run uvicorn app.main:app --port 8000
+py -3.12 -m uv run uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
+
+Every `/api/ask` call spends API credit, so the server only listens on this machine: `--host 127.0.0.1` is uvicorn's
+default, and you should not change it. It also refuses requests whose `Host` header is not in `ALLOWED_HOSTS`
+(comma-separated, default `localhost,127.0.0.1,[::1]`; this blocks DNS rebinding) and `POST /api/ask` requests from
+another origin (403). For any use beyond your own machine, add your hostname to `ALLOWED_HOSTS` and set `API_TOKEN`:
+clients must then send it in the `X-API-Token` header (401 otherwise); the page has a field for it, kept in
+`sessionStorage` for the tab. Use HTTPS in front of the server, since the token is sent in the clear otherwise.
 
 Open **http://localhost:8000**. `GET /api/papers` lists the papers. `POST /api/ask` takes
 `{"question": "...", "k": 8}` (question 1 to 1000 characters, `k` 1 to 20) and returns
@@ -52,7 +59,7 @@ model refusal is 422 with `{"error": "refused", "detail": ...}`, a bad request i
 
 Settings come from the environment or a `.env` file at the repo root; see [.env.example](.env.example). They are
 `ANTHROPIC_API_KEY`, `LLM_MODEL` (default `claude-opus-5-5`), `LLM_EFFORT` (default `medium`), `EMBED` (`auto` or
-`off`), `DATA_DIR` and `ARXIV_DELAY_S`.
+`off`), `DATA_DIR`, `ARXIV_DELAY_S`, `ALLOWED_HOSTS` and `API_TOKEN`.
 
 ## How it works
 
