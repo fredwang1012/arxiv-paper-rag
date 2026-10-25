@@ -18,3 +18,7 @@ in [semantic-pdf-reader](https://github.com/fredwang1012/semantic-pdf-reader).
 ## Status
 
 Not started. Retrieval will build on semantic-pdf-reader's hybrid index.
+
+## License
+
+Copyright (c) 2026 Frederick Wang. All rights reserved. See [LICENSE](LICENSE).
