@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>arXiv paper RAG</title>
+<style>
+  :root {
+    --bg: #fafaf8; --fg: #1d1d1b; --muted: #6b6b66; --card: #ffffff; --border: #dcdcd6;
+    --accent: #2457c5; --on-accent: #ffffff; --warn: #a15c00; --error: #b3261e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #151514; --fg: #ece8e8; --muted: #9a9a93; --card: #1f1f1d; --border: #35352f;
+      --accent: #8ab0ff; --on-accent: #101010; --warn: #e0a64a; --error: #ff8a80;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.55 system-ui, sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 1.4rem; margin: 0 0 4px; }
+  p.sub { color: var(--muted); margin: 0 0 20px; }
+  textarea { width: 100%; min-height: 84px; padding: 10px; font: inherit; color: var(--fg);
+    background: var(--card); border: 1px solid var(--border); border-radius: 6px; resize: vertical; }
+  button { margin-top: 8px; padding: 8px 16px; font: inherit; color: var(--on-accent); background: var(--accent);
+    border: 0; border-radius: 6px; cursor: pointer; }
+  button:disabled { opacity: .6; cursor: default; }
+  #status { margin: 16px 0; color: var(--muted); }
+  #status.error { color: var(--error); }
+  #answer { white-space: pre-wrap; background: var(--card); border: 1px solid var(--border);
+    border-radius: 6px; padding: 12px 14px; }
+  h2 { font-size: 1.05rem; margin: 24px 0 8px; }
+  ol#refs { padding-left: 0; list-style: none; margin: 0; }
+  ol#refs li { background: var(--card); border: 1px solid var(--border); border-radius: 6px;
+    padding: 10px 14px; margin-bottom: 8px; }
+  .num { font-weight: 600; color: var(--accent); }
+  .meta { color: var(--muted); }
+  blockquote { margin: 6px 0 0; padding-left: 10px; border-left: 3px solid var(--border); }
+  .warn { color: var(--warn); }
+  [hidden] { display: none; }
+</style>
+</head>
+<body>
+<main>
+  <h1>arXiv paper RAG</h1>
+  <p class="sub">Ask about the CSC2626 Week 5 papers. Every claim cites its paper and section.</p>
+  <form id="form">
+    <textarea id="q" maxlength="1000" required placeholder="How does the NPI core decide when to stop?"></textarea>
+    <button id="go" type="submit">Ask</button>
+  </form>
+  <div id="status" role="status"></div>
+  <div id="result" hidden>
+    <div id="answer"></div>
+    <div id="unresolved" class="warn" hidden></div>
+    <h2>References</h2>
+    <ol id="refs"></ol>
+  </div>
+</main>
+<script>
+// Answers, quotes and paper titles come from a model and from untrusted paper text:
+// they are only ever put on the page with textContent, never as markup.
+const $ = (id) => document.getElementById(id);
+
+function el(tag, className, text) {
+  const e = document.createElement(tag);
+  if (className) e.className = className;
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+const PARTICLES = ["de", "van", "von", "di", "da", "le"];
+
+// Last word of a name, keeping lower-case particles: "Nando de Freitas" -> "de Freitas".
+function surname(name) {
+  const w = name.trim().split(/\s+/).filter(Boolean);
+  let i = w.length - 1;
+  while (i > 0 && PARTICLES.includes(w[i - 1].toLowerCase())) i--;
+  return w.slice(Math.max(i, 0)).join(" ");
+}
+
+function authorsOf(list) {
+  const names = list.map(surname).filter(Boolean);
+  if (names.length === 0) return "Unknown";
+  if (names.length === 1) return names[0];
+  return names.length === 2 ? names[0] + " & " + names[1] : names[0] + " et al.";
+}
+
+function render(data) {
+  $("answer").textContent = data.text;
+  const un = $("unresolved");
+  un.hidden = data.unresolved_markers.length === 0;
+  un.textContent = un.hidden ? "" : "Warning: the answer uses " +
+    data.unresolved_markers.map((n) => "[" + n + "]").join(", ") + " with no matching citation.";
+  const refs = $("refs");
+  refs.replaceChildren();
+  for (const r of data.references) {
+    const li = el("li");
+    li.append(el("span", "num", "[" + r.passages.join(", ") + "] "));
+    li.append(el("span", "", authorsOf(r.authors) + " " + r.year + ", " + r.title + ", §" + r.section));
+    const cit = data.citations.find((c) => c.paper_id === r.paper_id && c.section === r.section);
+    if (cit && cit.quote) {
+      const q = el("blockquote", "meta", cit.quote);
+      if (!cit.quote_found) q.append(el("span", "warn", " ⚠ quote not found in the passage"));
+      li.append(q);
+    }
+    refs.append(li);
+  }
+  $("result").hidden = false;
+}
+
+$("form").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const question = $("q").value.trim();
+  if (!question) return;
+  $("go").disabled = true;
+  $("result").hidden = true;
+  $("status").className = "";
+  $("status").textContent = "Thinking...";
+  try {
+    const res = await fetch("/api/ask", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question }),
+    });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      $("status").className = "error";
+      $("status").textContent = typeof body.detail === "string" ? body.detail : "Request failed (" + res.status + ").";
+      return;
+    }
+    $("status").textContent = "";
+    render(body);
+  } catch (e) {
+    $("status").className = "error";
+    $("status").textContent = "Could not reach the server.";
+  } finally {
+    $("go").disabled = false;
+  }
+});
+</script>
+</body>
+</html>

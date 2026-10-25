@@ -1,0 +1,3780 @@
+{
+  "date": "2026-10-25T00:48:59-04:00",
+  "questions_file": "eval/questions.jsonl",
+  "n_questions": 32,
+  "ks": [
+    1,
+    3,
+    5,
+    8
+  ],
+  "chunks": 380,
+  "retrieval": {
+    "bm25": {
+      "summary": {
+        "paper": {
+          "recall@1": 0.96875,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "recall@8": 1.0,
+          "mrr": 0.984375
+        },
+        "section": {
+          "recall@1": 0.59375,
+          "recall@3": 0.9375,
+          "recall@5": 0.96875,
+          "recall@8": 0.96875,
+          "mrr": 0.7510416666666667
+        },
+        "all_papers": {
+          "recall@1": 0.0,
+          "recall@3": 0.7142857142857143,
+          "recall@5": 0.8571428571428571,
+          "recall@8": 0.8571428571428571,
+          "questions": 7
+        }
+      },
+      "questions": [
+        {
+          "id": "npi-components",
+          "type": "factual",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "1511.06279#c0",
+              "paper_id": "1511.06279",
+              "section": "Abstract",
+              "score": 1.0
+            },
+            {
+              "chunk_id": "1710.01813#c21",
+              "paper_id": "1710.01813",
+              "section": "3 Problem Formulation > 3.1 Neural Programmer-Interpreter (NPI)",
+              "score": 0.9623
+            },
+            {
+              "chunk_id": "1710.01813#c23",
+              "paper_id": "1710.01813",
+              "section": "4 Neural Task Programming",
+              "score": 0.8614
+            },
+            {
+              "chunk_id": "1511.06279#c2",
+              "paper_id": "1511.06279",
+              "section": "1 Introduction",
+              "score": 0.8289
+            },
+            {
+              "chunk_id": "1511.06279#c3",
+              "paper_id": "1511.06279",
+              "section": "1 Introduction",
+              "score": 0.8083
+            },
+            {
+              "chunk_id": "1710.01813#c22",
+              "paper_id": "1710.01813",
+              "section": "3 Problem Formulation > 3.1 Neural Programmer-Interpreter (NPI)",
+              "score": 0.7941
+            },
+            {
+              "chunk_id": "1710.01813#c20",
+              "paper_id": "1710.01813",
+              "section": "3 Problem Formulation > 3.1 Neural Programmer-Interpreter (NPI)",
+              "score": 0.7836
+            },
+            {
+              "chunk_id": "1710.01813#c24",
+              "paper_id": "1710.01813",
+              "section": "4 Neural Task Programming",
+              "score": 0.7678
+            }
+          ]
+        },
+        {
+          "id": "npi-core-stop",
+          "type": "term",
+          "paper_rank": 2,
+          "section_rank": 2,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "1710.01813#c20",
+              "paper_id": "1710.01813",
+              "section": "3 Problem Formulation > 3.1 Neural Programmer-Interpreter (NPI)",
+              "score": 1.0
+            },
+            {
+              "chunk_id": "1511.06279#c13",
+              "paper_id": "1511.06279",
+              "section": "3 Model",
+              "score": 0.9649
+            },
+            {
+              "chunk_id": "1710.01813#c8",
+              "paper_id": "1710.01813",
+              "section": "2 Background & Related work",
+              "score": 0.9482
+            },
+            {
+              "chunk_id": "1710.01813#c21",
+              "paper_id": "1710.01813",
+              "section": "3 Problem Formulation > 3.1 Neural Programmer-Interpreter (NPI)",
+              "score": 0.9197
+            },
+            {
+              "chunk_id": "1710.01813#c22",
+              "paper_id": "1710.01813",
+              "section": "3 Problem Formulation > 3.1 Neural Programmer-Interpreter (NPI)",
+              "score": 0.9138
+            },
+            {
+              "chunk_id": "1710.01813#c23",
+              "paper_id": "1710.01813",
+              "section": "4 Neural Task Programming",
+              "score": 0.8817
+            },
+            {
+              "chunk_id": "1710.01813#c18",
+              "paper_id": "1710.01813",
+              "section": "3 Problem Formulation",
+              "score": 0.879
+            },
+            {
+              "chunk_id": "1511.06279#c17",
+              "paper_id": "1511.06279",
+              "section": "3 Model > 3.1 Inference",
+              "score": 0.8484
+            }
+          ]
+        },
+        {
+          "id": "npi-training",
+          "type": "method",
+          "paper_rank": 1,
+          "section_rank": 3,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "1511.06279#c4",
+              "paper_id": "1511.06279",
+              "section": "1 Introduction",
+              "score": 1.0
+            },
+            {
+              "chunk_id": "1511.06279#c54",
+              "paper_id": "1511.06279",
+              "section": "6 Appendix > 6.3 Additional experiment on addition generalization",
+              "score": 0.9687
+            },
+            {
+              "chunk_id": "1511.06279#c27",
+              "paper_id": "1511.06279",
+              "section": "3 Model > 3.2 Training",
+              "score": 0.9318
+            },
+            {
+              "chunk_id": "1511.06279#c5",
+              "paper_id": "1511.06279",
+              "section": "1 Introduction",
+              "score": 0.9259
+            },
+            {
+              "chunk_id": "1803.01840#c33",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments",
+              "score": 0.9216
+            },
+            {
+              "chunk_id": "2206.11795#c114",
+              "paper_id": "2206.11795",
+              "section": "G Reinforcement Learning Fine-Tuning > G.1 Reinforcement Learning Fine-Tuning Training Details",
+              "score": 0.9075
+            },
+            {
+              "chunk_id": "1511.06279#c48",
+              "paper_id": "1511.06279",
+              "section": "5 Conclusion",
+              "score": 0.9061
+            },
+            {
+              "chunk_id": "1511.06279#c28",
+              "paper_id": "1511.06279",
+              "section": "3 Model > 3.2 Training",
+              "score": 0.9059
+            }
+          ]
+        },
+        {
+          "id": "npi-sort-length",
+          "type": "factual",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "1511.06279#c39",
+              "paper_id": "1511.06279",
+              "section": "4 Experiments > 4.2 Sample complexity and generalization",
+              "score": 1.0
+            },
+            {
+              "chunk_id": "1511.06279#c40",
+              "paper_id": "1511.06279",
+              "section": "4 Experiments > 4.2 Sample complexity and generalization",
+              "score": 0.9824
+            },
+            {
+              "chunk_id": "1511.06279#c42",
+              "paper_id": "1511.06279",
+              "section": "4 Experiments > 4.2 Sample complexity and generalization",
+              "score": 0.9732
+            },
+            {
+              "chunk_id": "1511.06279#c41",
+              "paper_id": "1511.06279",
+              "section": "4 Experiments > 4.2 Sample complexity and generalization",
+              "score": 0.9639
+            },
+            {
+              "chunk_id": "1511.06279#c51",
+              "paper_id": "1511.06279",
+              "section": "6 Appendix > 6.2 Generated execution trace of BUBBLESORT",
+              "score": 0.8853
+            },
+            {
+              "chunk_id": "1511.06279#c6",
+              "paper_id": "1511.06279",
+              "section": "1 Introduction",
+              "score": 0.8707
+            },
+            {
+              "chunk_id": "1511.06279#c47",
+              "paper_id": "1511.06279",
+              "section": "4 Experiments > 4.4 Solving multiple tasks with a single network",
+              "score": 0.8621
+            },
+            {
+              "chunk_id": "1511.06279#c34",
+              "paper_id": "1511.06279",
+              "section": "4 Experiments > 4.1 Task and environment descriptions > Sorting",
+              "score": 0.8581
+            }
+          ]
+        },
+        {
+          "id": "npi-act",
+          "type": "term",
+          "paper_rank": 1,
+          "section_rank": null,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "1511.06279#c3",
+              "paper_id": "1511.06279",
+              "section": "1 Introduction",
+              "score": 1.0
+            },
+            {
+              "chunk_id": "1710.01813#c20",
+              "paper_id": "1710.01813",
+              "section": "3 Problem Formulation > 3.1 Neural Programmer-Interpreter (NPI)",
+              "score": 0.8249
+            },
+            {
+              "chunk_id": "1710.01813#c22",
+              "paper_id": "1710.01813",
+              "section": "3 Problem Formulation > 3.1 Neural Programmer-Interpreter (NPI)",
+              "score": 0.8174
+            },
+            {
+              "chunk_id": "1710.01813#c21",
+              "paper_id": "1710.01813",
+              "section": "3 Problem Formulation > 3.1 Neural Programmer-Interpreter (NPI)",
+              "score": 0.8111
+            },
+            {
+              "chunk_id": "1710.01813#c14",
+              "paper_id": "1710.01813",
+              "section": "2 Background & Related work",
+              "score": 0.8095
+            },
+            {
+              "chunk_id": "1511.06279#c0",
+              "paper_id": "1511.06279",
+              "section": "Abstract",
+              "score": 0.7682
+            },
+            {
+              "chunk_id": "1511.06279#c46",
+              "paper_id": "1511.06279",
+              "section": "4 Experiments > 4.3 Learning new programs with a fixed core",
+              "score": 0.7659
+            },
+            {
+              "chunk_id": "1511.06279#c13",
+              "paper_id": "1511.06279",
+              "section": "3 Model",
+              "score": 0.7643
+            }
+          ]
+        },
+        {
+          "id": "ntp-components",
+          "type": "factual",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "1710.01813#c24",
+              "paper_id": "1710.01813",
+              "section": "4 Neural Task Programming",
+              "score": 1.0
+            },
+            {
+              "chunk_id": "1710.01813#c23",
+              "paper_id": "1710.01813",
+              "section": "4 Neural Task Programming",
+              "score": 0.968
+            },
+            {
+              "chunk_id": "1710.01813#c21",
+              "paper_id": "1710.01813",
+              "section": "3 Problem Formulation > 3.1 Neural Programmer-Interpreter (NPI)",
+              "score": 0.903
+            },
+            {
+              "chunk_id": "1710.01813#c5",
+              "paper_id": "1710.01813",
+              "section": "1 Introduction",
+              "score": 0.8428
+            },
+            {
+              "chunk_id": "1511.06279#c0",
+              "paper_id": "1511.06279",
+              "section": "Abstract",
+              "score": 0.8417
+            },
+            {
+              "chunk_id": "1511.06279#c3",
+              "paper_id": "1511.06279",
+              "section": "1 Introduction",
+              "score": 0.8406
+            },
+            {
+              "chunk_id": "1710.01813#c20",
+              "paper_id": "1710.01813",
+              "section": "3 Problem Formulation > 3.1 Neural Programmer-Interpreter (NPI)",
+              "score": 0.7931
+            },
+            {
+              "chunk_id": "1710.01813#c2",
+              "paper_id": "1710.01813",
+              "section": "1 Introduction",
+              "score": 0.792
+            }
+          ]
+        },
+        {
+          "id": "ntp-scoping",
+          "type": "term",
+          "paper_rank": 1,
+          "section_rank": 2,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "1710.01813#c39",
+              "paper_id": "1710.01813",
+              "section": "5 Experimental Setup",
+              "score": 1.0
+            },
+            {
+              "chunk_id": "1710.01813#c47",
+              "paper_id": "1710.01813",
+              "section": "7 Experiment 2: Block Stacking",
+              "score": 0.9832
+            },
+            {
+              "chunk_id": "2206.11795#c134",
+              "paper_id": "2206.11795",
+              "section": "I Text Conditioning",
+              "score": 0.9668
+            },
+            {
+              "chunk_id": "1710.01813#c28",
+              "paper_id": "1710.01813",
+              "section": "4 Neural Task Programming",
+              "score": 0.9407
+            },
+            {
+              "chunk_id": "1710.01813#c31",
+              "paper_id": "1710.01813",
+              "section": "4 Neural Task Programming",
+              "score": 0.9188
+            },
+            {
+              "chunk_id": "2206.11795#c138",
+              "paper_id": "2206.11795",
+              "section": "I Text Conditioning",
+              "score": 0.8388
+            },
+            {
+              "chunk_id": "1803.01840#c52",
+              "paper_id": "1803.01840",
+              "section": "6 Discussion",
+              "score": 0.8257
+            },
+            {
+              "chunk_id": "1710.01813#c18",
+              "paper_id": "1710.01813",
+              "section": "3 Problem Formulation",
+              "score": 0.8241
+            }
+          ]
+        },
+        {
+          "id": "ntp-apis",
+          "type": "term",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "1710.01813#c25",
+              "paper_id": "1710.01813",
+              "section": "4 Neural Task Programming",
+              "score": 1.0
+            },
+            {
+              "chunk_id": "1710.01813#c0",
+              "paper_id": "1710.01813",
+              "section": "Abstract",
+              "score": 0.8441
+            },
+            {
+              "chunk_id": "1710.01813#c8",
+              "paper_id": "1710.01813",
+              "section": "2 Background & Related work",
+              "score": 0.829
+            },
+            {
+              "chunk_id": "1710.01813#c34",
+              "paper_id": "1710.01813",
+              "section": "5 Experimental Setup",
+              "score": 0.8205
+            },
+            {
+              "chunk_id": "1710.01813#c54",
+              "paper_id": "1710.01813",
+              "section": "9 Discussion & Future Work",
+              "score": 0.7949
+            },
+            {
+              "chunk_id": "1710.01813#c5",
+              "paper_id": "1710.01813",
+              "section": "1 Introduction",
+              "score": 0.7929
+            },
+            {
+              "chunk_id": "1710.01813#c36",
+              "paper_id": "1710.01813",
+              "section": "5 Experimental Setup",
+              "score": 0.7855
+            },
+            {
+              "chunk_id": "1710.01813#c38",
+              "paper_id": "1710.01813",
+              "section": "5 Experimental Setup",
+              "score": 0.7559
+            }
+          ]
+        },
+        {
+          "id": "ntp-generalization",
+          "type": "factual",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "1710.01813#c34",
+              "paper_id": "1710.01813",
+              "section": "5 Experimental Setup",
+              "score": 1.0
+            },
+            {
+              "chunk_id": "1710.01813#c6",
+              "paper_id": "1710.01813",
+              "section": "1 Introduction",
+              "score": 0.932
+            },
+            {
+              "chunk_id": "1710.01813#c46",
+              "paper_id": "1710.01813",
+              "section": "7 Experiment 2: Block Stacking",
+              "score": 0.8657
+            },
+            {
+              "chunk_id": "1710.01813#c0",
+              "paper_id": "1710.01813",
+              "section": "Abstract",
+              "score": 0.8486
+            },
+            {
+              "chunk_id": "1710.01813#c52",
+              "paper_id": "1710.01813",
+              "section": "8 Experiment 3: Table Clean-up",
+              "score": 0.8414
+            },
+            {
+              "chunk_id": "1710.01813#c24",
+              "paper_id": "1710.01813",
+              "section": "4 Neural Task Programming",
+              "score": 0.8403
+            },
+            {
+              "chunk_id": "1710.01813#c48",
+              "paper_id": "1710.01813",
+              "section": "7 Experiment 2: Block Stacking > 7.1 Adversarial Dynamics",
+              "score": 0.8371
+            },
+            {
+              "chunk_id": "1710.01813#c7",
+              "paper_id": "1710.01813",
+              "section": "1 Introduction",
+              "score": 0.8334
+            }
+          ]
+        },
+        {
+          "id": "ntp-sorting-tasks",
+          "type": "factual",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "1710.01813#c41",
+              "paper_id": "1710.01813",
+              "section": "6 Experiment 1: Object Sorting",
+              "score": 1.0
+            },
+            {
+              "chunk_id": "1710.01813#c42",
+              "paper_id": "1710.01813",
+              "section": "6 Experiment 1: Object Sorting",
+              "score": 0.938
+            },
+            {
+              "chunk_id": "1803.01840#c58",
+              "paper_id": "1803.01840",
+              "section": "B Detailed Results",
+              "score": 0.8416
+            },
+            {
+              "chunk_id": "1710.01813#c37",
+              "paper_id": "1710.01813",
+              "section": "5 Experimental Setup",
+              "score": 0.8107
+            },
+            {
+              "chunk_id": "1511.06279#c38",
+              "paper_id": "1511.06279",
+              "section": "4 Experiments > 4.2 Sample complexity and generalization",
+              "score": 0.8076
+            },
+            {
+              "chunk_id": "1710.01813#c36",
+              "paper_id": "1710.01813",
+              "section": "5 Experimental Setup",
+              "score": 0.8073
+            },
+            {
+              "chunk_id": "1710.01813#c49",
+              "paper_id": "1710.01813",
+              "section": "7 Experiment 2: Block Stacking > 7.2 NTP with Visual State",
+              "score": 0.7943
+            },
+            {
+              "chunk_id": "1710.01813#c40",
+              "paper_id": "1710.01813",
+              "section": "5 Experimental Setup",
+              "score": 0.7925
+            }
+          ]
+        },
+        {
+          "id": "taco-sketch",
+          "type": "factual",
+          "paper_rank": 1,
+          "section_rank": 2,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "1803.01840#c29",
+              "paper_id": "1803.01840",
+              "section": "4 Methods > 4.2 Temporal Alignment for Control (TACO)",
+              "score": 1.0
+            },
+            {
+              "chunk_id": "1803.01840#c5",
+              "paper_id": "1803.01840",
+              "section": "1 Introduction",
+              "score": 0.9748
+            },
+            {
+              "chunk_id": "1803.01840#c26",
+              "paper_id": "1803.01840",
+              "section": "4 Methods > 4.2 Temporal Alignment for Control (TACO)",
+              "score": 0.9397
+            },
+            {
+              "chunk_id": "1803.01840#c53",
+              "paper_id": "1803.01840",
+              "section": "7 Conclusion",
+              "score": 0.9368
+            },
+            {
+              "chunk_id": "1803.01840#c30",
+              "paper_id": "1803.01840",
+              "section": "4 Methods > 4.2 Temporal Alignment for Control (TACO)",
+              "score": 0.919
+            },
+            {
+              "chunk_id": "1803.01840#c37",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments > 5.1 Nav-World Domain",
+              "score": 0.9145
+            },
+            {
+              "chunk_id": "1803.01840#c4",
+              "paper_id": "1803.01840",
+              "section": "1 Introduction",
+              "score": 0.9098
+            },
+            {
+              "chunk_id": "1803.01840#c22",
+              "paper_id": "1803.01840",
+              "section": "4 Methods",
+              "score": 0.9091
+            }
+          ]
+        },
+        {
+          "id": "taco-alignment",
+          "type": "term",
+          "paper_rank": 1,
+          "section_rank": 2,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "1803.01840#c11",
+              "paper_id": "1803.01840",
+              "section": "2 Related Work",
+              "score": 1.0
+            },
+            {
+              "chunk_id": "1803.01840#c23",
+              "paper_id": "1803.01840",
+              "section": "4 Methods > 4.1 Naively Adapted CTC",
+              "score": 0.9307
+            },
+            {
+              "chunk_id": "1803.01840#c26",
+              "paper_id": "1803.01840",
+              "section": "4 Methods > 4.2 Temporal Alignment for Control (TACO)",
+              "score": 0.8745
+            },
+            {
+              "chunk_id": "1803.01840#c33",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments",
+              "score": 0.8696
+            },
+            {
+              "chunk_id": "1803.01840#c16",
+              "paper_id": "1803.01840",
+              "section": "3 Preliminaries > 3.2 Modular Learning from Demonstration",
+              "score": 0.8639
+            },
+            {
+              "chunk_id": "1803.01840#c45",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments > 5.3 Dial Domain > 5.3.1 Joint Space Dial Domain",
+              "score": 0.8482
+            },
+            {
+              "chunk_id": "1803.01840#c13",
+              "paper_id": "1803.01840",
+              "section": "3 Preliminaries > 3.1 Behavioural Cloning",
+              "score": 0.8464
+            },
+            {
+              "chunk_id": "1803.01840#c14",
+              "paper_id": "1803.01840",
+              "section": "3 Preliminaries > 3.1 Behavioural Cloning",
+              "score": 0.8382
+            }
+          ]
+        },
+        {
+          "id": "taco-stop",
+          "type": "method",
+          "paper_rank": 1,
+          "section_rank": 2,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "1803.01840#c33",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments",
+              "score": 1.0
+            },
+            {
+              "chunk_id": "1803.01840#c15",
+              "paper_id": "1803.01840",
+              "section": "3 Preliminaries > 3.2 Modular Learning from Demonstration",
+              "score": 0.8974
+            },
+            {
+              "chunk_id": "1803.01840#c5",
+              "paper_id": "1803.01840",
+              "section": "1 Introduction",
+              "score": 0.8869
+            },
+            {
+              "chunk_id": "1803.01840#c58",
+              "paper_id": "1803.01840",
+              "section": "B Detailed Results",
+              "score": 0.8764
+            },
+            {
+              "chunk_id": "1803.01840#c18",
+              "paper_id": "1803.01840",
+              "section": "3 Preliminaries > 3.3 Sequence Alignment",
+              "score": 0.8732
+            },
+            {
+              "chunk_id": "1803.01840#c30",
+              "paper_id": "1803.01840",
+              "section": "4 Methods > 4.2 Temporal Alignment for Control (TACO)",
+              "score": 0.8728
+            },
+            {
+              "chunk_id": "1803.01840#c50",
+              "paper_id": "1803.01840",
+              "section": "6 Discussion",
+              "score": 0.8636
+            },
+            {
+              "chunk_id": "1803.01840#c42",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments > 5.2 Craft Domain",
+              "score": 0.8491
+            }
+          ]
+        },
+        {
+          "id": "taco-dropout",
+          "type": "method",
+          "paper_rank": 1,
+          "section_rank": 3,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "1803.01840#c42",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments > 5.2 Craft Domain",
+              "score": 1.0
+            },
+            {
+              "chunk_id": "1803.01840#c33",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments",
+              "score": 0.9989
+            },
+            {
+              "chunk_id": "1803.01840#c32",
+              "paper_id": "1803.01840",
+              "section": "4 Methods > 4.2 Temporal Alignment for Control (TACO)",
+              "score": 0.977
+            },
+            {
+              "chunk_id": "2206.11795#c105",
+              "paper_id": "2206.11795",
+              "section": "G Reinforcement Learning Fine-Tuning > G.1 Reinforcement Learning Fine-Tuning Training Details",
+              "score": 0.9604
+            },
+            {
+              "chunk_id": "2206.11795#c121",
+              "paper_id": "2206.11795",
+              "section": "G Reinforcement Learning Fine-Tuning > G.2 Reinforcement Learning Fine-Tuning Additional Data",
+              "score": 0.9462
+            },
+            {
+              "chunk_id": "1803.01840#c56",
+              "paper_id": "1803.01840",
+              "section": "A Technical Details > A.1 Implementation Details and Architecture",
+              "score": 0.9409
+            },
+            {
+              "chunk_id": "1803.01840#c46",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments > 5.3 Dial Domain > 5.3.1 Joint Space Dial Domain",
+              "score": 0.9392
+            },
+            {
+              "chunk_id": "1803.01840#c41",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments > 5.2 Craft Domain",
+              "score": 0.9189
+            }
+          ]
+        },
+        {
+          "id": "taco-dial",
+          "type": "factual",
+          "paper_rank": 1,
+          "section_rank": 5,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "1803.01840#c46",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments > 5.3 Dial Domain > 5.3.1 Joint Space Dial Domain",
+              "score": 1.0
+            },
+            {
+              "chunk_id": "1803.01840#c48",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments > 5.3 Dial Domain > 5.3.2 Image Space Dial Domain",
+              "score": 0.9814
+            },
+            {
+              "chunk_id": "1803.01840#c47",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments > 5.3 Dial Domain > 5.3.1 Joint Space Dial Domain",
+              "score": 0.9781
+            },
+            {
+              "chunk_id": "1803.01840#c49",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments > 5.3 Dial Domain > 5.3.2 Image Space Dial Domain",
+              "score": 0.9649
+            },
+            {
+              "chunk_id": "1803.01840#c44",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments > 5.3 Dial Domain",
+              "score": 0.9602
+            },
+            {
+              "chunk_id": "1803.01840#c45",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments > 5.3 Dial Domain > 5.3.1 Joint Space Dial Domain",
+              "score": 0.9201
+            },
+            {
+              "chunk_id": "1803.01840#c60",
+              "paper_id": "1803.01840",
+              "section": "B Detailed Results > B.2 Joint-State Dial Domain",
+              "score": 0.9122
+            },
+            {
+              "chunk_id": "1803.01840#c43",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments > 5.3 Dial Domain",
+              "score": 0.9013
+            }
+          ]
+        },
+        {
+          "id": "gti-stages",
+          "type": "method",
+          "paper_rank": 1,
+          "section_rank": 3,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "2003.06085#c7",
+              "paper_id": "2003.06085",
+              "section": "1 Introduction",
+              "score": 1.0
+            },
+            {
+              "chunk_id": "2003.06085#c60",
+              "paper_id": "2003.06085",
+              "section": "6 Conclusion",
+              "score": 0.8655
+            },
+            {
+              "chunk_id": "2003.06085#c1",
+              "paper_id": "2003.06085",
+              "section": "Abstract",
+              "score": 0.863
+            },
+            {
+              "chunk_id": "2003.06085#c9",
+              "paper_id": "2003.06085",
+              "section": "1 Introduction",
+              "score": 0.8471
+            },
+            {
+              "chunk_id": "2003.06085#c36",
+              "paper_id": "2003.06085",
+              "section": "4 Method > Stage 2: Goal-Directed Imitation of Novel Behaviors",
+              "score": 0.8436
+            },
+            {
+              "chunk_id": "2003.06085#c22",
+              "paper_id": "2003.06085",
+              "section": "4 Method",
+              "score": 0.8315
+            },
+            {
+              "chunk_id": "2003.06085#c33",
+              "paper_id": "2003.06085",
+              "section": "4 Method > Stage 2: Goal-Directed Imitation of Novel Behaviors",
+              "score": 0.7792
+            },
+            {
+              "chunk_id": "1511.06279#c53",
+              "paper_id": "1511.06279",
+              "section": "6 Appendix > 6.3 Additional experiment on addition generalization",
+              "score": 0.767
+            }
+          ]
+        },
+        {
+          "id": "gti-intersection",
+          "type": "factual",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "2003.06085#c4",
+              "paper_id": "2003.06085",
+              "section": "1 Introduction",
+              "score": 1.0
+            },
+            {
+              "chunk_id": "2003.06085#c17",
+              "paper_id": "2003.06085",
+              "section": "3 Problem Formulation",
+              "score": 0.9753
+            },
+            {
+              "chunk_id": "2003.06085#c61",
+              "paper_id": "2003.06085",
+              "section": "6 Conclusion",
+              "score": 0.9313
+            },
+            {
+              "chunk_id": "2003.06085#c1",
+              "paper_id": "2003.06085",
+              "section": "Abstract",
+              "score": 0.9034
+            },
+            {
+              "chunk_id": "2003.06085#c60",
+              "paper_id": "2003.06085",
+              "section": "6 Conclusion",
+              "score": 0.8991
+            },
+            {
+              "chunk_id": "2003.06085#c0",
+              "paper_id": "2003.06085",
+              "section": "Abstract",
+              "score": 0.8767
+            },
+            {
+              "chunk_id": "1803.01840#c42",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments > 5.2 Craft Domain",
+              "score": 0.8649
+            },
+            {
+              "chunk_id": "2003.06085#c51",
+              "paper_id": "2003.06085",
+              "section": "5 Experiments > 5.2 Real World Robot Manipulation Experiments",
+              "score": 0.8645
+            }
+          ]
+        },
+        {
+          "id": "gti-gmm-prior",
+          "type": "method",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "2003.06085#c27",
+              "paper_id": "2003.06085",
+              "section": "4 Method > Stage 1: Multimodal Imitation Learning to Generate Novel Behaviors",
+              "score": 1.0
+            },
+            {
+              "chunk_id": "2003.06085#c8",
+              "paper_id": "2003.06085",
+              "section": "1 Introduction",
+              "score": 0.933
+            },
+            {
+              "chunk_id": "1710.01813#c50",
+              "paper_id": "1710.01813",
+              "section": "7 Experiment 2: Block Stacking > 7.2 NTP with Visual State",
+              "score": 0.7905
+            },
+            {
+              "chunk_id": "2003.06085#c5",
+              "paper_id": "2003.06085",
+              "section": "1 Introduction",
+              "score": 0.758
+            },
+            {
+              "chunk_id": "2003.06085#c31",
+              "paper_id": "2003.06085",
+              "section": "4 Method > Stage 1: Multimodal Imitation Learning to Generate Novel Behaviors",
+              "score": 0.7473
+            },
+            {
+              "chunk_id": "2003.06085#c35",
+              "paper_id": "2003.06085",
+              "section": "4 Method > Stage 2: Goal-Directed Imitation of Novel Behaviors",
+              "score": 0.7241
+            },
+            {
+              "chunk_id": "2003.06085#c45",
+              "paper_id": "2003.06085",
+              "section": "5 Experiments > 5.1 Simulation Experiments > Evaluation of Simulation Experiments",
+              "score": 0.7014
+            },
+            {
+              "chunk_id": "1710.01813#c18",
+              "paper_id": "1710.01813",
+              "section": "3 Problem Formulation",
+              "score": 0.6941
+            }
+          ]
+        },
+        {
+          "id": "gti-pandakitchen",
+          "type": "factual",
+          "paper_rank": 1,
+          "section_rank": 2,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "2003.06085#c44",
+              "paper_id": "2003.06085",
+              "section": "5 Experiments > 5.1 Simulation Experiments > Evaluation of Simulation Experiments",
+              "score": 1.0
+            },
+            {
+              "chunk_id": "2003.06085#c36",
+              "paper_id": "2003.06085",
+              "section": "4 Method > Stage 2: Goal-Directed Imitation of Novel Behaviors",
+              "score": 0.9903
+            },
+            {
+              "chunk_id": "2003.06085#c60",
+              "paper_id": "2003.06085",
+              "section": "6 Conclusion",
+              "score": 0.8474
+            },
+            {
+              "chunk_id": "2003.06085#c1",
+              "paper_id": "2003.06085",
+              "section": "Abstract",
+              "score": 0.8381
+            },
+            {
+              "chunk_id": "2003.06085#c43",
+              "paper_id": "2003.06085",
+              "section": "5 Experiments > 5.1 Simulation Experiments > Evaluation of Simulation Experiments",
+              "score": 0.8301
+            },
+            {
+              "chunk_id": "2003.06085#c56",
+              "paper_id": "2003.06085",
+              "section": "5 Experiments > 5.2 Real World Robot Manipulation Experiments > Evaluation of Real Robot Experiments",
+              "score": 0.8265
+            },
+            {
+              "chunk_id": "2003.06085#c17",
+              "paper_id": "2003.06085",
+              "section": "3 Problem Formulation",
+              "score": 0.8109
+            },
+            {
+              "chunk_id": "2003.06085#c55",
+              "paper_id": "2003.06085",
+              "section": "5 Experiments > 5.2 Real World Robot Manipulation Experiments > Evaluation of Real Robot Experiments",
+              "score": 0.8099
+            }
+          ]
+        },
+        {
+          "id": "gti-baselines",
+          "type": "factual",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "2003.06085#c37",
+              "paper_id": "2003.06085",
+              "section": "5 Experiments",
+              "score": 1.0
+            },
+            {
+              "chunk_id": "2003.06085#c1",
+              "paper_id": "2003.06085",
+              "section": "Abstract",
+              "score": 0.8355
+            },
+            {
+              "chunk_id": "2003.06085#c7",
+              "paper_id": "2003.06085",
+              "section": "1 Introduction",
+              "score": 0.8113
+            },
+            {
+              "chunk_id": "2003.06085#c61",
+              "paper_id": "2003.06085",
+              "section": "6 Conclusion",
+              "score": 0.8041
+            },
+            {
+              "chunk_id": "2003.06085#c4",
+              "paper_id": "2003.06085",
+              "section": "1 Introduction",
+              "score": 0.7978
+            },
+            {
+              "chunk_id": "1803.01840#c33",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments",
+              "score": 0.7963
+            },
+            {
+              "chunk_id": "2003.06085#c5",
+              "paper_id": "2003.06085",
+              "section": "1 Introduction",
+              "score": 0.7958
+            },
+            {
+              "chunk_id": "1511.06279#c53",
+              "paper_id": "1511.06279",
+              "section": "6 Appendix > 6.3 Additional experiment on addition generalization",
+              "score": 0.7894
+            }
+          ]
+        },
+        {
+          "id": "vpt-idm",
+          "type": "term",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "2206.11795#c16",
+              "paper_id": "2206.11795",
+              "section": "3 Methods",
+              "score": 1.0
+            },
+            {
+              "chunk_id": "2206.11795#c5",
+              "paper_id": "2206.11795",
+              "section": "1 Introduction",
+              "score": 0.9842
+            },
+            {
+              "chunk_id": "2206.11795#c90",
+              "paper_id": "2206.11795",
+              "section": "D Inverse Dynamics Model Training Details > D.3 Generating Pseudo Labels with the IDM",
+              "score": 0.9805
+            },
+            {
+              "chunk_id": "2206.11795#c22",
+              "paper_id": "2206.11795",
+              "section": "4 Results > 4.1 Performance of the Inverse Dynamics Model",
+              "score": 0.9027
+            },
+            {
+              "chunk_id": "2206.11795#c21",
+              "paper_id": "2206.11795",
+              "section": "4 Results > 4.1 Performance of the Inverse Dynamics Model",
+              "score": 0.8846
+            },
+            {
+              "chunk_id": "2206.11795#c46",
+              "paper_id": "2206.11795",
+              "section": "4 Results > 4.6 Effect of Inverse Dynamics Model Quality on Behavioral Cloning",
+              "score": 0.8686
+            },
+            {
+              "chunk_id": "2206.11795#c13",
+              "paper_id": "2206.11795",
+              "section": "2 Preliminaries and Related Work",
+              "score": 0.8592
+            },
+            {
+              "chunk_id": "2206.11795#c20",
+              "paper_id": "2206.11795",
+              "section": "4 Results > 4.1 Performance of the Inverse Dynamics Model",
+              "score": 0.8543
+            }
+          ]
+        },
+        {
+          "id": "vpt-kl-loss",
+          "type": "method",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "2206.11795#c109",
+              "paper_id": "2206.11795",
+              "section": "G Reinforcement Learning Fine-Tuning > G.1 Reinforcement Learning Fine-Tuning Training Details",
+              "score": 1.0
+            },
+            {
+              "chunk_id": "2206.11795#c36",
+              "paper_id": "2206.11795",
+              "section": "4 Results > 4.4 Fine-Tuning with Reinforcement Learning",
+              "score": 0.8607
+            },
+            {
+              "chunk_id": "2206.11795#c106",
+              "paper_id": "2206.11795",
+              "section": "G Reinforcement Learning Fine-Tuning > G.1 Reinforcement Learning Fine-Tuning Training Details",
+              "score": 0.8381
+            },
+            {
+              "chunk_id": "2206.11795#c108",
+              "paper_id": "2206.11795",
+              "section": "G Reinforcement Learning Fine-Tuning > G.1 Reinforcement Learning Fine-Tuning Training Details",
+              "score": 0.8279
+            },
+            {
+              "chunk_id": "2206.11795#c111",
+              "paper_id": "2206.11795",
+              "section": "G Reinforcement Learning Fine-Tuning > G.1 Reinforcement Learning Fine-Tuning Training Details",
+              "score": 0.8208
+            },
+            {
+              "chunk_id": "2206.11795#c105",
+              "paper_id": "2206.11795",
+              "section": "G Reinforcement Learning Fine-Tuning > G.1 Reinforcement Learning Fine-Tuning Training Details",
+              "score": 0.8198
+            },
+            {
+              "chunk_id": "2206.11795#c121",
+              "paper_id": "2206.11795",
+              "section": "G Reinforcement Learning Fine-Tuning > G.2 Reinforcement Learning Fine-Tuning Additional Data",
+              "score": 0.8027
+            },
+            {
+              "chunk_id": "2206.11795#c120",
+              "paper_id": "2206.11795",
+              "section": "G Reinforcement Learning Fine-Tuning > G.2 Reinforcement Learning Fine-Tuning Additional Data",
+              "score": 0.7985
+            }
+          ]
+        },
+        {
+          "id": "vpt-diamond",
+          "type": "factual",
+          "paper_rank": 1,
+          "section_rank": 3,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "2206.11795#c117",
+              "paper_id": "2206.11795",
+              "section": "G Reinforcement Learning Fine-Tuning > G.1 Reinforcement Learning Fine-Tuning Training Details",
+              "score": 1.0
+            },
+            {
+              "chunk_id": "2206.11795#c114",
+              "paper_id": "2206.11795",
+              "section": "G Reinforcement Learning Fine-Tuning > G.1 Reinforcement Learning Fine-Tuning Training Details",
+              "score": 0.9974
+            },
+            {
+              "chunk_id": "2206.11795#c38",
+              "paper_id": "2206.11795",
+              "section": "4 Results > 4.4 Fine-Tuning with Reinforcement Learning",
+              "score": 0.956
+            },
+            {
+              "chunk_id": "2206.11795#c36",
+              "paper_id": "2206.11795",
+              "section": "4 Results > 4.4 Fine-Tuning with Reinforcement Learning",
+              "score": 0.9475
+            },
+            {
+              "chunk_id": "2206.11795#c113",
+              "paper_id": "2206.11795",
+              "section": "G Reinforcement Learning Fine-Tuning > G.1 Reinforcement Learning Fine-Tuning Training Details",
+              "score": 0.9375
+            },
+            {
+              "chunk_id": "2206.11795#c39",
+              "paper_id": "2206.11795",
+              "section": "4 Results > 4.4 Fine-Tuning with Reinforcement Learning",
+              "score": 0.9288
+            },
+            {
+              "chunk_id": "2206.11795#c110",
+              "paper_id": "2206.11795",
+              "section": "G Reinforcement Learning Fine-Tuning > G.1 Reinforcement Learning Fine-Tuning Training Details",
+              "score": 0.9251
+            },
+            {
+              "chunk_id": "2206.11795#c112",
+              "paper_id": "2206.11795",
+              "section": "G Reinforcement Learning Fine-Tuning > G.1 Reinforcement Learning Fine-Tuning Training Details",
+              "score": 0.9125
+            }
+          ]
+        },
+        {
+          "id": "vpt-null-action",
+          "type": "term",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "2206.11795#c93",
+              "paper_id": "2206.11795",
+              "section": "E Foundation Model Behavioral Cloning > E.2 Null Action Filtering",
+              "score": 1.0
+            },
+            {
+              "chunk_id": "2206.11795#c95",
+              "paper_id": "2206.11795",
+              "section": "E Foundation Model Behavioral Cloning > E.3 Joint Hierarchical Action Space",
+              "score": 0.9548
+            },
+            {
+              "chunk_id": "2206.11795#c92",
+              "paper_id": "2206.11795",
+              "section": "E Foundation Model Behavioral Cloning > E.2 Null Action Filtering",
+              "score": 0.946
+            },
+            {
+              "chunk_id": "2206.11795#c100",
+              "paper_id": "2206.11795",
+              "section": "E Foundation Model Behavioral Cloning > E.3 Joint Hierarchical Action Space",
+              "score": 0.9137
+            },
+            {
+              "chunk_id": "2206.11795#c94",
+              "paper_id": "2206.11795",
+              "section": "E Foundation Model Behavioral Cloning > E.3 Joint Hierarchical Action Space",
+              "score": 0.8992
+            },
+            {
+              "chunk_id": "2206.11795#c134",
+              "paper_id": "2206.11795",
+              "section": "I Text Conditioning",
+              "score": 0.8202
+            },
+            {
+              "chunk_id": "2206.11795#c138",
+              "paper_id": "2206.11795",
+              "section": "I Text Conditioning",
+              "score": 0.7721
+            },
+            {
+              "chunk_id": "2206.11795#c108",
+              "paper_id": "2206.11795",
+              "section": "G Reinforcement Learning Fine-Tuning > G.1 Reinforcement Learning Fine-Tuning Training Details",
+              "score": 0.7521
+            }
+          ]
+        },
+        {
+          "id": "vpt-interface",
+          "type": "factual",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "2206.11795#c8",
+              "paper_id": "2206.11795",
+              "section": "1 Introduction",
+              "score": 1.0
+            },
+            {
+              "chunk_id": "2206.11795#c78",
+              "paper_id": "2206.11795",
+              "section": "C Minecraft environment details > C.1 Observation space",
+              "score": 0.8484
+            },
+            {
+              "chunk_id": "2206.11795#c7",
+              "paper_id": "2206.11795",
+              "section": "1 Introduction",
+              "score": 0.8338
+            },
+            {
+              "chunk_id": "2206.11795#c26",
+              "paper_id": "2206.11795",
+              "section": "4 Results > 4.2 VPT Foundation Model Training and Zero-Shot Performance",
+              "score": 0.8281
+            },
+            {
+              "chunk_id": "2206.11795#c25",
+              "paper_id": "2206.11795",
+              "section": "4 Results > 4.2 VPT Foundation Model Training and Zero-Shot Performance",
+              "score": 0.8133
+            },
+            {
+              "chunk_id": "2206.11795#c65",
+              "paper_id": "2206.11795",
+              "section": "B Contractor Data > B.1 Recording Contractor Play",
+              "score": 0.8087
+            },
+            {
+              "chunk_id": "2206.11795#c9",
+              "paper_id": "2206.11795",
+              "section": "1 Introduction",
+              "score": 0.792
+            },
+            {
+              "chunk_id": "2206.11795#c66",
+              "paper_id": "2206.11795",
+              "section": "B Contractor Data > B.1 Recording Contractor Play",
+              "score": 0.791
+            }
+          ]
+        },
+        {
+          "id": "x-ntp-vs-npi-core",
+          "type": "cross",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 2,
+          "all_papers_rank": 3,
+          "hits": [
+            {
+              "chunk_id": "1710.01813#c20",
+              "paper_id": "1710.01813",
+              "section": "3 Problem Formulation > 3.1 Neural Programmer-Interpreter (NPI)",
+              "score": 1.0
+            },
+            {
+              "chunk_id": "1710.01813#c24",
+              "paper_id": "1710.01813",
+              "section": "4 Neural Task Programming",
+              "score": 0.997
+            },
+            {
+              "chunk_id": "1511.06279#c13",
+              "paper_id": "1511.06279",
+              "section": "3 Model",
+              "score": 0.9406
+            },
+            {
+              "chunk_id": "1511.06279#c48",
+              "paper_id": "1511.06279",
+              "section": "5 Conclusion",
+              "score": 0.9144
+            },
+            {
+              "chunk_id": "1511.06279#c44",
+              "paper_id": "1511.06279",
+              "section": "4 Experiments > 4.3 Learning new programs with a fixed core",
+              "score": 0.8983
+            },
+            {
+              "chunk_id": "1710.01813#c23",
+              "paper_id": "1710.01813",
+              "section": "4 Neural Task Programming",
+              "score": 0.8981
+            },
+            {
+              "chunk_id": "1710.01813#c48",
+              "paper_id": "1710.01813",
+              "section": "7 Experiment 2: Block Stacking > 7.1 Adversarial Dynamics",
+              "score": 0.8974
+            },
+            {
+              "chunk_id": "1710.01813#c21",
+              "paper_id": "1710.01813",
+              "section": "3 Problem Formulation > 3.1 Neural Programmer-Interpreter (NPI)",
+              "score": 0.8954
+            }
+          ]
+        },
+        {
+          "id": "x-supervision",
+          "type": "cross",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 3,
+          "all_papers_rank": 5,
+          "hits": [
+            {
+              "chunk_id": "1710.01813#c31",
+              "paper_id": "1710.01813",
+              "section": "4 Neural Task Programming",
+              "score": 1.0
+            },
+            {
+              "chunk_id": "1710.01813#c14",
+              "paper_id": "1710.01813",
+              "section": "2 Background & Related work",
+              "score": 0.9695
+            },
+            {
+              "chunk_id": "1511.06279#c4",
+              "paper_id": "1511.06279",
+              "section": "1 Introduction",
+              "score": 0.9466
+            },
+            {
+              "chunk_id": "1511.06279#c10",
+              "paper_id": "1511.06279",
+              "section": "2 Related work",
+              "score": 0.9298
+            },
+            {
+              "chunk_id": "1803.01840#c41",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments > 5.2 Craft Domain",
+              "score": 0.9056
+            },
+            {
+              "chunk_id": "1803.01840#c52",
+              "paper_id": "1803.01840",
+              "section": "6 Discussion",
+              "score": 0.8855
+            },
+            {
+              "chunk_id": "1511.06279#c24",
+              "paper_id": "1511.06279",
+              "section": "3 Model > 3.2 Training",
+              "score": 0.8834
+            },
+            {
+              "chunk_id": "1710.01813#c34",
+              "paper_id": "1710.01813",
+              "section": "5 Experimental Setup",
+              "score": 0.8788
+            }
+          ]
+        },
+        {
+          "id": "x-behavioral-cloning",
+          "type": "cross",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 2,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "2003.06085#c37",
+              "paper_id": "2003.06085",
+              "section": "5 Experiments",
+              "score": 1.0
+            },
+            {
+              "chunk_id": "2003.06085#c35",
+              "paper_id": "2003.06085",
+              "section": "4 Method > Stage 2: Goal-Directed Imitation of Novel Behaviors",
+              "score": 0.9822
+            },
+            {
+              "chunk_id": "2206.11795#c91",
+              "paper_id": "2206.11795",
+              "section": "E Foundation Model Behavioral Cloning > E.1 Foundation Model Architecture",
+              "score": 0.98
+            },
+            {
+              "chunk_id": "2206.11795#c45",
+              "paper_id": "2206.11795",
+              "section": "4 Results > 4.6 Effect of Inverse Dynamics Model Quality on Behavioral Cloning",
+              "score": 0.9654
+            },
+            {
+              "chunk_id": "2206.11795#c94",
+              "paper_id": "2206.11795",
+              "section": "E Foundation Model Behavioral Cloning > E.3 Joint Hierarchical Action Space",
+              "score": 0.926
+            },
+            {
+              "chunk_id": "2206.11795#c6",
+              "paper_id": "2206.11795",
+              "section": "1 Introduction",
+              "score": 0.9246
+            },
+            {
+              "chunk_id": "2206.11795#c102",
+              "paper_id": "2206.11795",
+              "section": "F Behavioral Cloning Fine-Tuning",
+              "score": 0.9139
+            },
+            {
+              "chunk_id": "2206.11795#c53",
+              "paper_id": "2206.11795",
+              "section": "A Collecting Internet Data > A.1 Initial Unclean Dataset Curation",
+              "score": 0.9061
+            }
+          ]
+        },
+        {
+          "id": "x-curriculum",
+          "type": "cross",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 2,
+          "all_papers_rank": 2,
+          "hits": [
+            {
+              "chunk_id": "1511.06279#c27",
+              "paper_id": "1511.06279",
+              "section": "3 Model > 3.2 Training",
+              "score": 1.0
+            },
+            {
+              "chunk_id": "1710.01813#c32",
+              "paper_id": "1710.01813",
+              "section": "4 Neural Task Programming",
+              "score": 0.9076
+            },
+            {
+              "chunk_id": "1511.06279#c26",
+              "paper_id": "1511.06279",
+              "section": "3 Model > 3.2 Training",
+              "score": 0.8744
+            },
+            {
+              "chunk_id": "1511.06279#c28",
+              "paper_id": "1511.06279",
+              "section": "3 Model > 3.2 Training",
+              "score": 0.8647
+            },
+            {
+              "chunk_id": "1511.06279#c52",
+              "paper_id": "1511.06279",
+              "section": "6 Appendix > 6.3 Additional experiment on addition generalization",
+              "score": 0.8437
+            },
+            {
+              "chunk_id": "2206.11795#c15",
+              "paper_id": "2206.11795",
+              "section": "2 Preliminaries and Related Work",
+              "score": 0.8257
+            },
+            {
+              "chunk_id": "1511.06279#c4",
+              "paper_id": "1511.06279",
+              "section": "1 Introduction",
+              "score": 0.7935
+            },
+            {
+              "chunk_id": "1511.06279#c5",
+              "paper_id": "1511.06279",
+              "section": "1 Introduction",
+              "score": 0.7827
+            }
+          ]
+        },
+        {
+          "id": "x-decomposition",
+          "type": "cross",
+          "paper_rank": 1,
+          "section_rank": 2,
+          "gold_papers_found": 2,
+          "all_papers_rank": 2,
+          "hits": [
+            {
+              "chunk_id": "1803.01840#c33",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments",
+              "score": 1.0
+            },
+            {
+              "chunk_id": "1710.01813#c15",
+              "paper_id": "1710.01813",
+              "section": "2 Background & Related work",
+              "score": 0.927
+            },
+            {
+              "chunk_id": "1710.01813#c6",
+              "paper_id": "1710.01813",
+              "section": "1 Introduction",
+              "score": 0.924
+            },
+            {
+              "chunk_id": "1710.01813#c0",
+              "paper_id": "1710.01813",
+              "section": "Abstract",
+              "score": 0.9111
+            },
+            {
+              "chunk_id": "1803.01840#c58",
+              "paper_id": "1803.01840",
+              "section": "B Detailed Results",
+              "score": 0.9059
+            },
+            {
+              "chunk_id": "1803.01840#c46",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments > 5.3 Dial Domain > 5.3.1 Joint Space Dial Domain",
+              "score": 0.9019
+            },
+            {
+              "chunk_id": "1803.01840#c48",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments > 5.3 Dial Domain > 5.3.2 Image Space Dial Domain",
+              "score": 0.9012
+            },
+            {
+              "chunk_id": "1710.01813#c4",
+              "paper_id": "1710.01813",
+              "section": "1 Introduction",
+              "score": 0.8879
+            }
+          ]
+        },
+        {
+          "id": "x-real-robots",
+          "type": "cross",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 2,
+          "all_papers_rank": 2,
+          "hits": [
+            {
+              "chunk_id": "1710.01813#c36",
+              "paper_id": "1710.01813",
+              "section": "5 Experimental Setup",
+              "score": 1.0
+            },
+            {
+              "chunk_id": "2003.06085#c55",
+              "paper_id": "2003.06085",
+              "section": "5 Experiments > 5.2 Real World Robot Manipulation Experiments > Evaluation of Real Robot Experiments",
+              "score": 0.9873
+            },
+            {
+              "chunk_id": "1710.01813#c42",
+              "paper_id": "1710.01813",
+              "section": "6 Experiment 1: Object Sorting",
+              "score": 0.9545
+            },
+            {
+              "chunk_id": "2003.06085#c53",
+              "paper_id": "2003.06085",
+              "section": "5 Experiments > 5.2 Real World Robot Manipulation Experiments",
+              "score": 0.9459
+            },
+            {
+              "chunk_id": "2003.06085#c59",
+              "paper_id": "2003.06085",
+              "section": "5 Experiments > 5.2 Real World Robot Manipulation Experiments > Evaluation of Real Robot Experiments",
+              "score": 0.9424
+            },
+            {
+              "chunk_id": "2003.06085#c48",
+              "paper_id": "2003.06085",
+              "section": "5 Experiments > 5.2 Real World Robot Manipulation Experiments",
+              "score": 0.9368
+            },
+            {
+              "chunk_id": "2003.06085#c57",
+              "paper_id": "2003.06085",
+              "section": "5 Experiments > 5.2 Real World Robot Manipulation Experiments > Evaluation of Real Robot Experiments",
+              "score": 0.932
+            },
+            {
+              "chunk_id": "2003.06085#c58",
+              "paper_id": "2003.06085",
+              "section": "5 Experiments > 5.2 Real World Robot Manipulation Experiments > Evaluation of Real Robot Experiments",
+              "score": 0.9264
+            }
+          ]
+        },
+        {
+          "id": "x-forgetting",
+          "type": "cross",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 2,
+          "all_papers_rank": 2,
+          "hits": [
+            {
+              "chunk_id": "2206.11795#c36",
+              "paper_id": "2206.11795",
+              "section": "4 Results > 4.4 Fine-Tuning with Reinforcement Learning",
+              "score": 1.0
+            },
+            {
+              "chunk_id": "1511.06279#c44",
+              "paper_id": "1511.06279",
+              "section": "4 Experiments > 4.3 Learning new programs with a fixed core",
+              "score": 0.9307
+            },
+            {
+              "chunk_id": "2206.11795#c111",
+              "paper_id": "2206.11795",
+              "section": "G Reinforcement Learning Fine-Tuning > G.1 Reinforcement Learning Fine-Tuning Training Details",
+              "score": 0.909
+            },
+            {
+              "chunk_id": "2206.11795#c41",
+              "paper_id": "2206.11795",
+              "section": "4 Results > 4.4 Fine-Tuning with Reinforcement Learning",
+              "score": 0.8973
+            },
+            {
+              "chunk_id": "1511.06279#c48",
+              "paper_id": "1511.06279",
+              "section": "5 Conclusion",
+              "score": 0.8486
+            },
+            {
+              "chunk_id": "2206.11795#c14",
+              "paper_id": "2206.11795",
+              "section": "2 Preliminaries and Related Work",
+              "score": 0.828
+            },
+            {
+              "chunk_id": "2206.11795#c35",
+              "paper_id": "2206.11795",
+              "section": "4 Results > 4.4 Fine-Tuning with Reinforcement Learning",
+              "score": 0.8221
+            },
+            {
+              "chunk_id": "2206.11795#c70",
+              "paper_id": "2206.11795",
+              "section": "B Contractor Data > B.2 Contractor Contract",
+              "score": 0.8204
+            }
+          ]
+        }
+      ]
+    },
+    "hybrid": {
+      "summary": {
+        "paper": {
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "recall@8": 1.0,
+          "mrr": 1.0
+        },
+        "section": {
+          "recall@1": 0.65625,
+          "recall@3": 0.9375,
+          "recall@5": 0.96875,
+          "recall@8": 1.0,
+          "mrr": 0.79140625
+        },
+        "all_papers": {
+          "recall@1": 0.0,
+          "recall@3": 0.7142857142857143,
+          "recall@5": 0.8571428571428571,
+          "recall@8": 0.8571428571428571,
+          "questions": 7
+        }
+      },
+      "questions": [
+        {
+          "id": "npi-components",
+          "type": "factual",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "1511.06279#c0",
+              "paper_id": "1511.06279",
+              "section": "Abstract",
+              "score": 0.9428
+            },
+            {
+              "chunk_id": "1710.01813#c21",
+              "paper_id": "1710.01813",
+              "section": "3 Problem Formulation > 3.1 Neural Programmer-Interpreter (NPI)",
+              "score": 0.9028
+            },
+            {
+              "chunk_id": "1511.06279#c2",
+              "paper_id": "1511.06279",
+              "section": "1 Introduction",
+              "score": 0.8703
+            },
+            {
+              "chunk_id": "1710.01813#c23",
+              "paper_id": "1710.01813",
+              "section": "4 Neural Task Programming",
+              "score": 0.8593
+            },
+            {
+              "chunk_id": "1511.06279#c3",
+              "paper_id": "1511.06279",
+              "section": "1 Introduction",
+              "score": 0.837
+            },
+            {
+              "chunk_id": "1710.01813#c22",
+              "paper_id": "1710.01813",
+              "section": "3 Problem Formulation > 3.1 Neural Programmer-Interpreter (NPI)",
+              "score": 0.8341
+            },
+            {
+              "chunk_id": "1710.01813#c20",
+              "paper_id": "1710.01813",
+              "section": "3 Problem Formulation > 3.1 Neural Programmer-Interpreter (NPI)",
+              "score": 0.8174
+            },
+            {
+              "chunk_id": "1511.06279#c14",
+              "paper_id": "1511.06279",
+              "section": "3 Model",
+              "score": 0.8155
+            }
+          ]
+        },
+        {
+          "id": "npi-core-stop",
+          "type": "term",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "1511.06279#c13",
+              "paper_id": "1511.06279",
+              "section": "3 Model",
+              "score": 0.9122
+            },
+            {
+              "chunk_id": "1710.01813#c20",
+              "paper_id": "1710.01813",
+              "section": "3 Problem Formulation > 3.1 Neural Programmer-Interpreter (NPI)",
+              "score": 0.9095
+            },
+            {
+              "chunk_id": "1710.01813#c21",
+              "paper_id": "1710.01813",
+              "section": "3 Problem Formulation > 3.1 Neural Programmer-Interpreter (NPI)",
+              "score": 0.8853
+            },
+            {
+              "chunk_id": "1710.01813#c22",
+              "paper_id": "1710.01813",
+              "section": "3 Problem Formulation > 3.1 Neural Programmer-Interpreter (NPI)",
+              "score": 0.88
+            },
+            {
+              "chunk_id": "1710.01813#c8",
+              "paper_id": "1710.01813",
+              "section": "2 Background & Related work",
+              "score": 0.8799
+            },
+            {
+              "chunk_id": "1511.06279#c3",
+              "paper_id": "1511.06279",
+              "section": "1 Introduction",
+              "score": 0.8599
+            },
+            {
+              "chunk_id": "1710.01813#c23",
+              "paper_id": "1710.01813",
+              "section": "4 Neural Task Programming",
+              "score": 0.8516
+            },
+            {
+              "chunk_id": "1511.06279#c44",
+              "paper_id": "1511.06279",
+              "section": "4 Experiments > 4.3 Learning new programs with a fixed core",
+              "score": 0.8501
+            }
+          ]
+        },
+        {
+          "id": "npi-training",
+          "type": "method",
+          "paper_rank": 1,
+          "section_rank": 3,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "1511.06279#c4",
+              "paper_id": "1511.06279",
+              "section": "1 Introduction",
+              "score": 0.9241
+            },
+            {
+              "chunk_id": "1511.06279#c54",
+              "paper_id": "1511.06279",
+              "section": "6 Appendix > 6.3 Additional experiment on addition generalization",
+              "score": 0.8915
+            },
+            {
+              "chunk_id": "1511.06279#c28",
+              "paper_id": "1511.06279",
+              "section": "3 Model > 3.2 Training",
+              "score": 0.8755
+            },
+            {
+              "chunk_id": "1511.06279#c1",
+              "paper_id": "1511.06279",
+              "section": "Abstract",
+              "score": 0.875
+            },
+            {
+              "chunk_id": "1511.06279#c27",
+              "paper_id": "1511.06279",
+              "section": "3 Model > 3.2 Training",
+              "score": 0.8745
+            },
+            {
+              "chunk_id": "1511.06279#c48",
+              "paper_id": "1511.06279",
+              "section": "5 Conclusion",
+              "score": 0.8618
+            },
+            {
+              "chunk_id": "1710.01813#c14",
+              "paper_id": "1710.01813",
+              "section": "2 Background & Related work",
+              "score": 0.8604
+            },
+            {
+              "chunk_id": "1511.06279#c5",
+              "paper_id": "1511.06279",
+              "section": "1 Introduction",
+              "score": 0.8589
+            }
+          ]
+        },
+        {
+          "id": "npi-sort-length",
+          "type": "factual",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "1511.06279#c39",
+              "paper_id": "1511.06279",
+              "section": "4 Experiments > 4.2 Sample complexity and generalization",
+              "score": 0.9359
+            },
+            {
+              "chunk_id": "1511.06279#c40",
+              "paper_id": "1511.06279",
+              "section": "4 Experiments > 4.2 Sample complexity and generalization",
+              "score": 0.9343
+            },
+            {
+              "chunk_id": "1511.06279#c42",
+              "paper_id": "1511.06279",
+              "section": "4 Experiments > 4.2 Sample complexity and generalization",
+              "score": 0.9114
+            },
+            {
+              "chunk_id": "1511.06279#c41",
+              "paper_id": "1511.06279",
+              "section": "4 Experiments > 4.2 Sample complexity and generalization",
+              "score": 0.9107
+            },
+            {
+              "chunk_id": "1511.06279#c51",
+              "paper_id": "1511.06279",
+              "section": "6 Appendix > 6.2 Generated execution trace of BUBBLESORT",
+              "score": 0.8819
+            },
+            {
+              "chunk_id": "1511.06279#c47",
+              "paper_id": "1511.06279",
+              "section": "4 Experiments > 4.4 Solving multiple tasks with a single network",
+              "score": 0.8651
+            },
+            {
+              "chunk_id": "1511.06279#c6",
+              "paper_id": "1511.06279",
+              "section": "1 Introduction",
+              "score": 0.8634
+            },
+            {
+              "chunk_id": "1511.06279#c34",
+              "paper_id": "1511.06279",
+              "section": "4 Experiments > 4.1 Task and environment descriptions > Sorting",
+              "score": 0.862
+            }
+          ]
+        },
+        {
+          "id": "npi-act",
+          "type": "term",
+          "paper_rank": 1,
+          "section_rank": 8,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "1511.06279#c3",
+              "paper_id": "1511.06279",
+              "section": "1 Introduction",
+              "score": 0.8932
+            },
+            {
+              "chunk_id": "1710.01813#c20",
+              "paper_id": "1710.01813",
+              "section": "3 Problem Formulation > 3.1 Neural Programmer-Interpreter (NPI)",
+              "score": 0.8268
+            },
+            {
+              "chunk_id": "1710.01813#c22",
+              "paper_id": "1710.01813",
+              "section": "3 Problem Formulation > 3.1 Neural Programmer-Interpreter (NPI)",
+              "score": 0.825
+            },
+            {
+              "chunk_id": "1710.01813#c14",
+              "paper_id": "1710.01813",
+              "section": "2 Background & Related work",
+              "score": 0.8225
+            },
+            {
+              "chunk_id": "1710.01813#c21",
+              "paper_id": "1710.01813",
+              "section": "3 Problem Formulation > 3.1 Neural Programmer-Interpreter (NPI)",
+              "score": 0.8178
+            },
+            {
+              "chunk_id": "1511.06279#c0",
+              "paper_id": "1511.06279",
+              "section": "Abstract",
+              "score": 0.8128
+            },
+            {
+              "chunk_id": "1511.06279#c13",
+              "paper_id": "1511.06279",
+              "section": "3 Model",
+              "score": 0.8046
+            },
+            {
+              "chunk_id": "1511.06279#c23",
+              "paper_id": "1511.06279",
+              "section": "3 Model > 3.1 Inference",
+              "score": 0.804
+            }
+          ]
+        },
+        {
+          "id": "ntp-components",
+          "type": "factual",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "1710.01813#c24",
+              "paper_id": "1710.01813",
+              "section": "4 Neural Task Programming",
+              "score": 0.9234
+            },
+            {
+              "chunk_id": "1710.01813#c23",
+              "paper_id": "1710.01813",
+              "section": "4 Neural Task Programming",
+              "score": 0.922
+            },
+            {
+              "chunk_id": "1710.01813#c21",
+              "paper_id": "1710.01813",
+              "section": "3 Problem Formulation > 3.1 Neural Programmer-Interpreter (NPI)",
+              "score": 0.8784
+            },
+            {
+              "chunk_id": "1710.01813#c5",
+              "paper_id": "1710.01813",
+              "section": "1 Introduction",
+              "score": 0.8555
+            },
+            {
+              "chunk_id": "1511.06279#c0",
+              "paper_id": "1511.06279",
+              "section": "Abstract",
+              "score": 0.8448
+            },
+            {
+              "chunk_id": "1511.06279#c3",
+              "paper_id": "1511.06279",
+              "section": "1 Introduction",
+              "score": 0.842
+            },
+            {
+              "chunk_id": "1710.01813#c2",
+              "paper_id": "1710.01813",
+              "section": "1 Introduction",
+              "score": 0.8342
+            },
+            {
+              "chunk_id": "1710.01813#c33",
+              "paper_id": "1710.01813",
+              "section": "4 Neural Task Programming",
+              "score": 0.8281
+            }
+          ]
+        },
+        {
+          "id": "ntp-scoping",
+          "type": "term",
+          "paper_rank": 1,
+          "section_rank": 2,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "1710.01813#c39",
+              "paper_id": "1710.01813",
+              "section": "5 Experimental Setup",
+              "score": 0.9179
+            },
+            {
+              "chunk_id": "1710.01813#c47",
+              "paper_id": "1710.01813",
+              "section": "7 Experiment 2: Block Stacking",
+              "score": 0.9143
+            },
+            {
+              "chunk_id": "2206.11795#c134",
+              "paper_id": "2206.11795",
+              "section": "I Text Conditioning",
+              "score": 0.8801
+            },
+            {
+              "chunk_id": "1710.01813#c28",
+              "paper_id": "1710.01813",
+              "section": "4 Neural Task Programming",
+              "score": 0.8729
+            },
+            {
+              "chunk_id": "1710.01813#c31",
+              "paper_id": "1710.01813",
+              "section": "4 Neural Task Programming",
+              "score": 0.8617
+            },
+            {
+              "chunk_id": "1710.01813#c48",
+              "paper_id": "1710.01813",
+              "section": "7 Experiment 2: Block Stacking > 7.1 Adversarial Dynamics",
+              "score": 0.8282
+            },
+            {
+              "chunk_id": "1710.01813#c18",
+              "paper_id": "1710.01813",
+              "section": "3 Problem Formulation",
+              "score": 0.828
+            },
+            {
+              "chunk_id": "2206.11795#c137",
+              "paper_id": "2206.11795",
+              "section": "I Text Conditioning",
+              "score": 0.8243
+            }
+          ]
+        },
+        {
+          "id": "ntp-apis",
+          "type": "term",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "1710.01813#c25",
+              "paper_id": "1710.01813",
+              "section": "4 Neural Task Programming",
+              "score": 0.937
+            },
+            {
+              "chunk_id": "1710.01813#c0",
+              "paper_id": "1710.01813",
+              "section": "Abstract",
+              "score": 0.8594
+            },
+            {
+              "chunk_id": "1710.01813#c8",
+              "paper_id": "1710.01813",
+              "section": "2 Background & Related work",
+              "score": 0.8435
+            },
+            {
+              "chunk_id": "1710.01813#c54",
+              "paper_id": "1710.01813",
+              "section": "9 Discussion & Future Work",
+              "score": 0.8367
+            },
+            {
+              "chunk_id": "1710.01813#c34",
+              "paper_id": "1710.01813",
+              "section": "5 Experimental Setup",
+              "score": 0.8331
+            },
+            {
+              "chunk_id": "1710.01813#c5",
+              "paper_id": "1710.01813",
+              "section": "1 Introduction",
+              "score": 0.8287
+            },
+            {
+              "chunk_id": "1710.01813#c36",
+              "paper_id": "1710.01813",
+              "section": "5 Experimental Setup",
+              "score": 0.816
+            },
+            {
+              "chunk_id": "1710.01813#c4",
+              "paper_id": "1710.01813",
+              "section": "1 Introduction",
+              "score": 0.8146
+            }
+          ]
+        },
+        {
+          "id": "ntp-generalization",
+          "type": "factual",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "1710.01813#c34",
+              "paper_id": "1710.01813",
+              "section": "5 Experimental Setup",
+              "score": 0.9324
+            },
+            {
+              "chunk_id": "1710.01813#c6",
+              "paper_id": "1710.01813",
+              "section": "1 Introduction",
+              "score": 0.9078
+            },
+            {
+              "chunk_id": "1710.01813#c46",
+              "paper_id": "1710.01813",
+              "section": "7 Experiment 2: Block Stacking",
+              "score": 0.8767
+            },
+            {
+              "chunk_id": "1710.01813#c52",
+              "paper_id": "1710.01813",
+              "section": "8 Experiment 3: Table Clean-up",
+              "score": 0.8639
+            },
+            {
+              "chunk_id": "1710.01813#c0",
+              "paper_id": "1710.01813",
+              "section": "Abstract",
+              "score": 0.8636
+            },
+            {
+              "chunk_id": "1710.01813#c7",
+              "paper_id": "1710.01813",
+              "section": "1 Introduction",
+              "score": 0.8589
+            },
+            {
+              "chunk_id": "1710.01813#c54",
+              "paper_id": "1710.01813",
+              "section": "9 Discussion & Future Work",
+              "score": 0.8581
+            },
+            {
+              "chunk_id": "1710.01813#c24",
+              "paper_id": "1710.01813",
+              "section": "4 Neural Task Programming",
+              "score": 0.8542
+            }
+          ]
+        },
+        {
+          "id": "ntp-sorting-tasks",
+          "type": "factual",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "1710.01813#c41",
+              "paper_id": "1710.01813",
+              "section": "6 Experiment 1: Object Sorting",
+              "score": 0.9295
+            },
+            {
+              "chunk_id": "1710.01813#c42",
+              "paper_id": "1710.01813",
+              "section": "6 Experiment 1: Object Sorting",
+              "score": 0.898
+            },
+            {
+              "chunk_id": "1710.01813#c37",
+              "paper_id": "1710.01813",
+              "section": "5 Experimental Setup",
+              "score": 0.8458
+            },
+            {
+              "chunk_id": "1710.01813#c36",
+              "paper_id": "1710.01813",
+              "section": "5 Experimental Setup",
+              "score": 0.8341
+            },
+            {
+              "chunk_id": "1710.01813#c2",
+              "paper_id": "1710.01813",
+              "section": "1 Introduction",
+              "score": 0.8306
+            },
+            {
+              "chunk_id": "1710.01813#c47",
+              "paper_id": "1710.01813",
+              "section": "7 Experiment 2: Block Stacking",
+              "score": 0.8298
+            },
+            {
+              "chunk_id": "1710.01813#c49",
+              "paper_id": "1710.01813",
+              "section": "7 Experiment 2: Block Stacking > 7.2 NTP with Visual State",
+              "score": 0.8247
+            },
+            {
+              "chunk_id": "1710.01813#c40",
+              "paper_id": "1710.01813",
+              "section": "5 Experimental Setup",
+              "score": 0.8232
+            }
+          ]
+        },
+        {
+          "id": "taco-sketch",
+          "type": "factual",
+          "paper_rank": 1,
+          "section_rank": 2,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "1803.01840#c29",
+              "paper_id": "1803.01840",
+              "section": "4 Methods > 4.2 Temporal Alignment for Control (TACO)",
+              "score": 0.9134
+            },
+            {
+              "chunk_id": "1803.01840#c5",
+              "paper_id": "1803.01840",
+              "section": "1 Introduction",
+              "score": 0.9066
+            },
+            {
+              "chunk_id": "1803.01840#c53",
+              "paper_id": "1803.01840",
+              "section": "7 Conclusion",
+              "score": 0.9049
+            },
+            {
+              "chunk_id": "1803.01840#c26",
+              "paper_id": "1803.01840",
+              "section": "4 Methods > 4.2 Temporal Alignment for Control (TACO)",
+              "score": 0.8873
+            },
+            {
+              "chunk_id": "1803.01840#c6",
+              "paper_id": "1803.01840",
+              "section": "1 Introduction",
+              "score": 0.8829
+            },
+            {
+              "chunk_id": "1803.01840#c38",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments > 5.1 Nav-World Domain",
+              "score": 0.8811
+            },
+            {
+              "chunk_id": "1803.01840#c22",
+              "paper_id": "1803.01840",
+              "section": "4 Methods",
+              "score": 0.878
+            },
+            {
+              "chunk_id": "1803.01840#c37",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments > 5.1 Nav-World Domain",
+              "score": 0.8736
+            }
+          ]
+        },
+        {
+          "id": "taco-alignment",
+          "type": "term",
+          "paper_rank": 1,
+          "section_rank": 2,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "1803.01840#c11",
+              "paper_id": "1803.01840",
+              "section": "2 Related Work",
+              "score": 0.9293
+            },
+            {
+              "chunk_id": "1803.01840#c23",
+              "paper_id": "1803.01840",
+              "section": "4 Methods > 4.1 Naively Adapted CTC",
+              "score": 0.9131
+            },
+            {
+              "chunk_id": "1803.01840#c26",
+              "paper_id": "1803.01840",
+              "section": "4 Methods > 4.2 Temporal Alignment for Control (TACO)",
+              "score": 0.888
+            },
+            {
+              "chunk_id": "1803.01840#c33",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments",
+              "score": 0.8717
+            },
+            {
+              "chunk_id": "1803.01840#c13",
+              "paper_id": "1803.01840",
+              "section": "3 Preliminaries > 3.1 Behavioural Cloning",
+              "score": 0.8681
+            },
+            {
+              "chunk_id": "1803.01840#c22",
+              "paper_id": "1803.01840",
+              "section": "4 Methods",
+              "score": 0.8674
+            },
+            {
+              "chunk_id": "1803.01840#c16",
+              "paper_id": "1803.01840",
+              "section": "3 Preliminaries > 3.2 Modular Learning from Demonstration",
+              "score": 0.8663
+            },
+            {
+              "chunk_id": "1803.01840#c45",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments > 5.3 Dial Domain > 5.3.1 Joint Space Dial Domain",
+              "score": 0.8635
+            }
+          ]
+        },
+        {
+          "id": "taco-stop",
+          "type": "method",
+          "paper_rank": 1,
+          "section_rank": 2,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "1803.01840#c33",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments",
+              "score": 0.913
+            },
+            {
+              "chunk_id": "1803.01840#c15",
+              "paper_id": "1803.01840",
+              "section": "3 Preliminaries > 3.2 Modular Learning from Demonstration",
+              "score": 0.8803
+            },
+            {
+              "chunk_id": "1803.01840#c5",
+              "paper_id": "1803.01840",
+              "section": "1 Introduction",
+              "score": 0.8763
+            },
+            {
+              "chunk_id": "1803.01840#c50",
+              "paper_id": "1803.01840",
+              "section": "6 Discussion",
+              "score": 0.8755
+            },
+            {
+              "chunk_id": "1803.01840#c58",
+              "paper_id": "1803.01840",
+              "section": "B Detailed Results",
+              "score": 0.8701
+            },
+            {
+              "chunk_id": "1803.01840#c32",
+              "paper_id": "1803.01840",
+              "section": "4 Methods > 4.2 Temporal Alignment for Control (TACO)",
+              "score": 0.8698
+            },
+            {
+              "chunk_id": "1803.01840#c42",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments > 5.2 Craft Domain",
+              "score": 0.8685
+            },
+            {
+              "chunk_id": "1803.01840#c30",
+              "paper_id": "1803.01840",
+              "section": "4 Methods > 4.2 Temporal Alignment for Control (TACO)",
+              "score": 0.8635
+            }
+          ]
+        },
+        {
+          "id": "taco-dropout",
+          "type": "method",
+          "paper_rank": 1,
+          "section_rank": 3,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "1803.01840#c42",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments > 5.2 Craft Domain",
+              "score": 0.9185
+            },
+            {
+              "chunk_id": "1803.01840#c33",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments",
+              "score": 0.9148
+            },
+            {
+              "chunk_id": "1803.01840#c32",
+              "paper_id": "1803.01840",
+              "section": "4 Methods > 4.2 Temporal Alignment for Control (TACO)",
+              "score": 0.9026
+            },
+            {
+              "chunk_id": "1803.01840#c56",
+              "paper_id": "1803.01840",
+              "section": "A Technical Details > A.1 Implementation Details and Architecture",
+              "score": 0.8962
+            },
+            {
+              "chunk_id": "1803.01840#c46",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments > 5.3 Dial Domain > 5.3.1 Joint Space Dial Domain",
+              "score": 0.8877
+            },
+            {
+              "chunk_id": "1803.01840#c41",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments > 5.2 Craft Domain",
+              "score": 0.8777
+            },
+            {
+              "chunk_id": "2206.11795#c105",
+              "paper_id": "2206.11795",
+              "section": "G Reinforcement Learning Fine-Tuning > G.1 Reinforcement Learning Fine-Tuning Training Details",
+              "score": 0.8774
+            },
+            {
+              "chunk_id": "1803.01840#c45",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments > 5.3 Dial Domain > 5.3.1 Joint Space Dial Domain",
+              "score": 0.8696
+            }
+          ]
+        },
+        {
+          "id": "taco-dial",
+          "type": "factual",
+          "paper_rank": 1,
+          "section_rank": 5,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "1803.01840#c46",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments > 5.3 Dial Domain > 5.3.1 Joint Space Dial Domain",
+              "score": 0.9241
+            },
+            {
+              "chunk_id": "1803.01840#c48",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments > 5.3 Dial Domain > 5.3.2 Image Space Dial Domain",
+              "score": 0.9221
+            },
+            {
+              "chunk_id": "1803.01840#c47",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments > 5.3 Dial Domain > 5.3.1 Joint Space Dial Domain",
+              "score": 0.9212
+            },
+            {
+              "chunk_id": "1803.01840#c49",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments > 5.3 Dial Domain > 5.3.2 Image Space Dial Domain",
+              "score": 0.9114
+            },
+            {
+              "chunk_id": "1803.01840#c44",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments > 5.3 Dial Domain",
+              "score": 0.9112
+            },
+            {
+              "chunk_id": "1803.01840#c45",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments > 5.3 Dial Domain > 5.3.1 Joint Space Dial Domain",
+              "score": 0.8944
+            },
+            {
+              "chunk_id": "1803.01840#c60",
+              "paper_id": "1803.01840",
+              "section": "B Detailed Results > B.2 Joint-State Dial Domain",
+              "score": 0.8877
+            },
+            {
+              "chunk_id": "1803.01840#c43",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments > 5.3 Dial Domain",
+              "score": 0.8841
+            }
+          ]
+        },
+        {
+          "id": "gti-stages",
+          "type": "method",
+          "paper_rank": 1,
+          "section_rank": 2,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "2003.06085#c7",
+              "paper_id": "2003.06085",
+              "section": "1 Introduction",
+              "score": 0.9325
+            },
+            {
+              "chunk_id": "2003.06085#c1",
+              "paper_id": "2003.06085",
+              "section": "Abstract",
+              "score": 0.8784
+            },
+            {
+              "chunk_id": "2003.06085#c60",
+              "paper_id": "2003.06085",
+              "section": "6 Conclusion",
+              "score": 0.8681
+            },
+            {
+              "chunk_id": "2003.06085#c9",
+              "paper_id": "2003.06085",
+              "section": "1 Introduction",
+              "score": 0.8631
+            },
+            {
+              "chunk_id": "2003.06085#c22",
+              "paper_id": "2003.06085",
+              "section": "4 Method",
+              "score": 0.8573
+            },
+            {
+              "chunk_id": "2003.06085#c36",
+              "paper_id": "2003.06085",
+              "section": "4 Method > Stage 2: Goal-Directed Imitation of Novel Behaviors",
+              "score": 0.8547
+            },
+            {
+              "chunk_id": "2003.06085#c33",
+              "paper_id": "2003.06085",
+              "section": "4 Method > Stage 2: Goal-Directed Imitation of Novel Behaviors",
+              "score": 0.8334
+            },
+            {
+              "chunk_id": "2003.06085#c4",
+              "paper_id": "2003.06085",
+              "section": "1 Introduction",
+              "score": 0.8241
+            }
+          ]
+        },
+        {
+          "id": "gti-intersection",
+          "type": "factual",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "2003.06085#c4",
+              "paper_id": "2003.06085",
+              "section": "1 Introduction",
+              "score": 0.9273
+            },
+            {
+              "chunk_id": "2003.06085#c17",
+              "paper_id": "2003.06085",
+              "section": "3 Problem Formulation",
+              "score": 0.9126
+            },
+            {
+              "chunk_id": "2003.06085#c61",
+              "paper_id": "2003.06085",
+              "section": "6 Conclusion",
+              "score": 0.8936
+            },
+            {
+              "chunk_id": "2003.06085#c60",
+              "paper_id": "2003.06085",
+              "section": "6 Conclusion",
+              "score": 0.8884
+            },
+            {
+              "chunk_id": "2003.06085#c1",
+              "paper_id": "2003.06085",
+              "section": "Abstract",
+              "score": 0.8848
+            },
+            {
+              "chunk_id": "2003.06085#c37",
+              "paper_id": "2003.06085",
+              "section": "5 Experiments",
+              "score": 0.8503
+            },
+            {
+              "chunk_id": "2003.06085#c16",
+              "paper_id": "2003.06085",
+              "section": "3 Problem Formulation",
+              "score": 0.8423
+            },
+            {
+              "chunk_id": "2003.06085#c7",
+              "paper_id": "2003.06085",
+              "section": "1 Introduction",
+              "score": 0.8398
+            }
+          ]
+        },
+        {
+          "id": "gti-gmm-prior",
+          "type": "method",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "2003.06085#c27",
+              "paper_id": "2003.06085",
+              "section": "4 Method > Stage 1: Multimodal Imitation Learning to Generate Novel Behaviors",
+              "score": 0.9265
+            },
+            {
+              "chunk_id": "2003.06085#c8",
+              "paper_id": "2003.06085",
+              "section": "1 Introduction",
+              "score": 0.8828
+            },
+            {
+              "chunk_id": "2003.06085#c5",
+              "paper_id": "2003.06085",
+              "section": "1 Introduction",
+              "score": 0.8264
+            },
+            {
+              "chunk_id": "1710.01813#c50",
+              "paper_id": "1710.01813",
+              "section": "7 Experiment 2: Block Stacking > 7.2 NTP with Visual State",
+              "score": 0.811
+            },
+            {
+              "chunk_id": "2003.06085#c31",
+              "paper_id": "2003.06085",
+              "section": "4 Method > Stage 1: Multimodal Imitation Learning to Generate Novel Behaviors",
+              "score": 0.8037
+            },
+            {
+              "chunk_id": "2003.06085#c35",
+              "paper_id": "2003.06085",
+              "section": "4 Method > Stage 2: Goal-Directed Imitation of Novel Behaviors",
+              "score": 0.8016
+            },
+            {
+              "chunk_id": "2003.06085#c45",
+              "paper_id": "2003.06085",
+              "section": "5 Experiments > 5.1 Simulation Experiments > Evaluation of Simulation Experiments",
+              "score": 0.8005
+            },
+            {
+              "chunk_id": "2003.06085#c28",
+              "paper_id": "2003.06085",
+              "section": "4 Method > Stage 1: Multimodal Imitation Learning to Generate Novel Behaviors",
+              "score": 0.7796
+            }
+          ]
+        },
+        {
+          "id": "gti-pandakitchen",
+          "type": "factual",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "2003.06085#c36",
+              "paper_id": "2003.06085",
+              "section": "4 Method > Stage 2: Goal-Directed Imitation of Novel Behaviors",
+              "score": 0.9267
+            },
+            {
+              "chunk_id": "2003.06085#c44",
+              "paper_id": "2003.06085",
+              "section": "5 Experiments > 5.1 Simulation Experiments > Evaluation of Simulation Experiments",
+              "score": 0.9055
+            },
+            {
+              "chunk_id": "2003.06085#c60",
+              "paper_id": "2003.06085",
+              "section": "6 Conclusion",
+              "score": 0.8362
+            },
+            {
+              "chunk_id": "2003.06085#c51",
+              "paper_id": "2003.06085",
+              "section": "5 Experiments > 5.2 Real World Robot Manipulation Experiments",
+              "score": 0.8357
+            },
+            {
+              "chunk_id": "2003.06085#c56",
+              "paper_id": "2003.06085",
+              "section": "5 Experiments > 5.2 Real World Robot Manipulation Experiments > Evaluation of Real Robot Experiments",
+              "score": 0.8324
+            },
+            {
+              "chunk_id": "2003.06085#c1",
+              "paper_id": "2003.06085",
+              "section": "Abstract",
+              "score": 0.8281
+            },
+            {
+              "chunk_id": "2003.06085#c43",
+              "paper_id": "2003.06085",
+              "section": "5 Experiments > 5.1 Simulation Experiments > Evaluation of Simulation Experiments",
+              "score": 0.8235
+            },
+            {
+              "chunk_id": "2003.06085#c17",
+              "paper_id": "2003.06085",
+              "section": "3 Problem Formulation",
+              "score": 0.8215
+            }
+          ]
+        },
+        {
+          "id": "gti-baselines",
+          "type": "factual",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "2003.06085#c37",
+              "paper_id": "2003.06085",
+              "section": "5 Experiments",
+              "score": 0.922
+            },
+            {
+              "chunk_id": "2003.06085#c1",
+              "paper_id": "2003.06085",
+              "section": "Abstract",
+              "score": 0.8449
+            },
+            {
+              "chunk_id": "2003.06085#c4",
+              "paper_id": "2003.06085",
+              "section": "1 Introduction",
+              "score": 0.8278
+            },
+            {
+              "chunk_id": "2003.06085#c61",
+              "paper_id": "2003.06085",
+              "section": "6 Conclusion",
+              "score": 0.8268
+            },
+            {
+              "chunk_id": "2003.06085#c60",
+              "paper_id": "2003.06085",
+              "section": "6 Conclusion",
+              "score": 0.8256
+            },
+            {
+              "chunk_id": "2003.06085#c7",
+              "paper_id": "2003.06085",
+              "section": "1 Introduction",
+              "score": 0.8207
+            },
+            {
+              "chunk_id": "2003.06085#c17",
+              "paper_id": "2003.06085",
+              "section": "3 Problem Formulation",
+              "score": 0.8173
+            },
+            {
+              "chunk_id": "2003.06085#c5",
+              "paper_id": "2003.06085",
+              "section": "1 Introduction",
+              "score": 0.8127
+            }
+          ]
+        },
+        {
+          "id": "vpt-idm",
+          "type": "term",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "2206.11795#c16",
+              "paper_id": "2206.11795",
+              "section": "3 Methods",
+              "score": 0.9451
+            },
+            {
+              "chunk_id": "2206.11795#c5",
+              "paper_id": "2206.11795",
+              "section": "1 Introduction",
+              "score": 0.9436
+            },
+            {
+              "chunk_id": "2206.11795#c90",
+              "paper_id": "2206.11795",
+              "section": "D Inverse Dynamics Model Training Details > D.3 Generating Pseudo Labels with the IDM",
+              "score": 0.9212
+            },
+            {
+              "chunk_id": "2206.11795#c22",
+              "paper_id": "2206.11795",
+              "section": "4 Results > 4.1 Performance of the Inverse Dynamics Model",
+              "score": 0.8972
+            },
+            {
+              "chunk_id": "2206.11795#c13",
+              "paper_id": "2206.11795",
+              "section": "2 Preliminaries and Related Work",
+              "score": 0.8861
+            },
+            {
+              "chunk_id": "2206.11795#c21",
+              "paper_id": "2206.11795",
+              "section": "4 Results > 4.1 Performance of the Inverse Dynamics Model",
+              "score": 0.8825
+            },
+            {
+              "chunk_id": "2206.11795#c46",
+              "paper_id": "2206.11795",
+              "section": "4 Results > 4.6 Effect of Inverse Dynamics Model Quality on Behavioral Cloning",
+              "score": 0.8787
+            },
+            {
+              "chunk_id": "2206.11795#c20",
+              "paper_id": "2206.11795",
+              "section": "4 Results > 4.1 Performance of the Inverse Dynamics Model",
+              "score": 0.8746
+            }
+          ]
+        },
+        {
+          "id": "vpt-kl-loss",
+          "type": "method",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "2206.11795#c109",
+              "paper_id": "2206.11795",
+              "section": "G Reinforcement Learning Fine-Tuning > G.1 Reinforcement Learning Fine-Tuning Training Details",
+              "score": 0.9415
+            },
+            {
+              "chunk_id": "2206.11795#c36",
+              "paper_id": "2206.11795",
+              "section": "4 Results > 4.4 Fine-Tuning with Reinforcement Learning",
+              "score": 0.866
+            },
+            {
+              "chunk_id": "2206.11795#c108",
+              "paper_id": "2206.11795",
+              "section": "G Reinforcement Learning Fine-Tuning > G.1 Reinforcement Learning Fine-Tuning Training Details",
+              "score": 0.8652
+            },
+            {
+              "chunk_id": "2206.11795#c111",
+              "paper_id": "2206.11795",
+              "section": "G Reinforcement Learning Fine-Tuning > G.1 Reinforcement Learning Fine-Tuning Training Details",
+              "score": 0.8602
+            },
+            {
+              "chunk_id": "2206.11795#c106",
+              "paper_id": "2206.11795",
+              "section": "G Reinforcement Learning Fine-Tuning > G.1 Reinforcement Learning Fine-Tuning Training Details",
+              "score": 0.8591
+            },
+            {
+              "chunk_id": "2206.11795#c105",
+              "paper_id": "2206.11795",
+              "section": "G Reinforcement Learning Fine-Tuning > G.1 Reinforcement Learning Fine-Tuning Training Details",
+              "score": 0.84
+            },
+            {
+              "chunk_id": "2206.11795#c121",
+              "paper_id": "2206.11795",
+              "section": "G Reinforcement Learning Fine-Tuning > G.2 Reinforcement Learning Fine-Tuning Additional Data",
+              "score": 0.8375
+            },
+            {
+              "chunk_id": "2206.11795#c120",
+              "paper_id": "2206.11795",
+              "section": "G Reinforcement Learning Fine-Tuning > G.2 Reinforcement Learning Fine-Tuning Additional Data",
+              "score": 0.8374
+            }
+          ]
+        },
+        {
+          "id": "vpt-diamond",
+          "type": "factual",
+          "paper_rank": 1,
+          "section_rank": 3,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "2206.11795#c114",
+              "paper_id": "2206.11795",
+              "section": "G Reinforcement Learning Fine-Tuning > G.1 Reinforcement Learning Fine-Tuning Training Details",
+              "score": 0.9244
+            },
+            {
+              "chunk_id": "2206.11795#c117",
+              "paper_id": "2206.11795",
+              "section": "G Reinforcement Learning Fine-Tuning > G.1 Reinforcement Learning Fine-Tuning Training Details",
+              "score": 0.9208
+            },
+            {
+              "chunk_id": "2206.11795#c38",
+              "paper_id": "2206.11795",
+              "section": "4 Results > 4.4 Fine-Tuning with Reinforcement Learning",
+              "score": 0.9044
+            },
+            {
+              "chunk_id": "2206.11795#c36",
+              "paper_id": "2206.11795",
+              "section": "4 Results > 4.4 Fine-Tuning with Reinforcement Learning",
+              "score": 0.9004
+            },
+            {
+              "chunk_id": "2206.11795#c39",
+              "paper_id": "2206.11795",
+              "section": "4 Results > 4.4 Fine-Tuning with Reinforcement Learning",
+              "score": 0.8971
+            },
+            {
+              "chunk_id": "2206.11795#c113",
+              "paper_id": "2206.11795",
+              "section": "G Reinforcement Learning Fine-Tuning > G.1 Reinforcement Learning Fine-Tuning Training Details",
+              "score": 0.8888
+            },
+            {
+              "chunk_id": "2206.11795#c35",
+              "paper_id": "2206.11795",
+              "section": "4 Results > 4.4 Fine-Tuning with Reinforcement Learning",
+              "score": 0.8842
+            },
+            {
+              "chunk_id": "2206.11795#c34",
+              "paper_id": "2206.11795",
+              "section": "4 Results > 4.4 Fine-Tuning with Reinforcement Learning",
+              "score": 0.8834
+            }
+          ]
+        },
+        {
+          "id": "vpt-null-action",
+          "type": "term",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "2206.11795#c93",
+              "paper_id": "2206.11795",
+              "section": "E Foundation Model Behavioral Cloning > E.2 Null Action Filtering",
+              "score": 0.9256
+            },
+            {
+              "chunk_id": "2206.11795#c92",
+              "paper_id": "2206.11795",
+              "section": "E Foundation Model Behavioral Cloning > E.2 Null Action Filtering",
+              "score": 0.9093
+            },
+            {
+              "chunk_id": "2206.11795#c95",
+              "paper_id": "2206.11795",
+              "section": "E Foundation Model Behavioral Cloning > E.3 Joint Hierarchical Action Space",
+              "score": 0.896
+            },
+            {
+              "chunk_id": "2206.11795#c100",
+              "paper_id": "2206.11795",
+              "section": "E Foundation Model Behavioral Cloning > E.3 Joint Hierarchical Action Space",
+              "score": 0.8762
+            },
+            {
+              "chunk_id": "2206.11795#c94",
+              "paper_id": "2206.11795",
+              "section": "E Foundation Model Behavioral Cloning > E.3 Joint Hierarchical Action Space",
+              "score": 0.8624
+            },
+            {
+              "chunk_id": "2206.11795#c134",
+              "paper_id": "2206.11795",
+              "section": "I Text Conditioning",
+              "score": 0.8191
+            },
+            {
+              "chunk_id": "2206.11795#c108",
+              "paper_id": "2206.11795",
+              "section": "G Reinforcement Learning Fine-Tuning > G.1 Reinforcement Learning Fine-Tuning Training Details",
+              "score": 0.8059
+            },
+            {
+              "chunk_id": "2206.11795#c111",
+              "paper_id": "2206.11795",
+              "section": "G Reinforcement Learning Fine-Tuning > G.1 Reinforcement Learning Fine-Tuning Training Details",
+              "score": 0.7961
+            }
+          ]
+        },
+        {
+          "id": "vpt-interface",
+          "type": "factual",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 1,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "2206.11795#c8",
+              "paper_id": "2206.11795",
+              "section": "1 Introduction",
+              "score": 0.931
+            },
+            {
+              "chunk_id": "2206.11795#c7",
+              "paper_id": "2206.11795",
+              "section": "1 Introduction",
+              "score": 0.8509
+            },
+            {
+              "chunk_id": "2206.11795#c26",
+              "paper_id": "2206.11795",
+              "section": "4 Results > 4.2 VPT Foundation Model Training and Zero-Shot Performance",
+              "score": 0.8479
+            },
+            {
+              "chunk_id": "2206.11795#c25",
+              "paper_id": "2206.11795",
+              "section": "4 Results > 4.2 VPT Foundation Model Training and Zero-Shot Performance",
+              "score": 0.844
+            },
+            {
+              "chunk_id": "2206.11795#c78",
+              "paper_id": "2206.11795",
+              "section": "C Minecraft environment details > C.1 Observation space",
+              "score": 0.8385
+            },
+            {
+              "chunk_id": "2206.11795#c9",
+              "paper_id": "2206.11795",
+              "section": "1 Introduction",
+              "score": 0.8338
+            },
+            {
+              "chunk_id": "2206.11795#c65",
+              "paper_id": "2206.11795",
+              "section": "B Contractor Data > B.1 Recording Contractor Play",
+              "score": 0.8318
+            },
+            {
+              "chunk_id": "2206.11795#c66",
+              "paper_id": "2206.11795",
+              "section": "B Contractor Data > B.1 Recording Contractor Play",
+              "score": 0.8218
+            }
+          ]
+        },
+        {
+          "id": "x-ntp-vs-npi-core",
+          "type": "cross",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 2,
+          "all_papers_rank": 2,
+          "hits": [
+            {
+              "chunk_id": "1710.01813#c24",
+              "paper_id": "1710.01813",
+              "section": "4 Neural Task Programming",
+              "score": 0.9228
+            },
+            {
+              "chunk_id": "1511.06279#c13",
+              "paper_id": "1511.06279",
+              "section": "3 Model",
+              "score": 0.9093
+            },
+            {
+              "chunk_id": "1710.01813#c20",
+              "paper_id": "1710.01813",
+              "section": "3 Problem Formulation > 3.1 Neural Programmer-Interpreter (NPI)",
+              "score": 0.9093
+            },
+            {
+              "chunk_id": "1511.06279#c48",
+              "paper_id": "1511.06279",
+              "section": "5 Conclusion",
+              "score": 0.8776
+            },
+            {
+              "chunk_id": "1511.06279#c44",
+              "paper_id": "1511.06279",
+              "section": "4 Experiments > 4.3 Learning new programs with a fixed core",
+              "score": 0.8692
+            },
+            {
+              "chunk_id": "1710.01813#c23",
+              "paper_id": "1710.01813",
+              "section": "4 Neural Task Programming",
+              "score": 0.8686
+            },
+            {
+              "chunk_id": "1710.01813#c48",
+              "paper_id": "1710.01813",
+              "section": "7 Experiment 2: Block Stacking > 7.1 Adversarial Dynamics",
+              "score": 0.8681
+            },
+            {
+              "chunk_id": "1710.01813#c21",
+              "paper_id": "1710.01813",
+              "section": "3 Problem Formulation > 3.1 Neural Programmer-Interpreter (NPI)",
+              "score": 0.8671
+            }
+          ]
+        },
+        {
+          "id": "x-supervision",
+          "type": "cross",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 3,
+          "all_papers_rank": 4,
+          "hits": [
+            {
+              "chunk_id": "1710.01813#c31",
+              "paper_id": "1710.01813",
+              "section": "4 Neural Task Programming",
+              "score": 0.9017
+            },
+            {
+              "chunk_id": "1511.06279#c4",
+              "paper_id": "1511.06279",
+              "section": "1 Introduction",
+              "score": 0.8733
+            },
+            {
+              "chunk_id": "1710.01813#c14",
+              "paper_id": "1710.01813",
+              "section": "2 Background & Related work",
+              "score": 0.8707
+            },
+            {
+              "chunk_id": "1803.01840#c41",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments > 5.2 Craft Domain",
+              "score": 0.8575
+            },
+            {
+              "chunk_id": "1803.01840#c52",
+              "paper_id": "1803.01840",
+              "section": "6 Discussion",
+              "score": 0.8548
+            },
+            {
+              "chunk_id": "1511.06279#c1",
+              "paper_id": "1511.06279",
+              "section": "Abstract",
+              "score": 0.8492
+            },
+            {
+              "chunk_id": "1511.06279#c24",
+              "paper_id": "1511.06279",
+              "section": "3 Model > 3.2 Training",
+              "score": 0.8466
+            },
+            {
+              "chunk_id": "1511.06279#c10",
+              "paper_id": "1511.06279",
+              "section": "2 Related work",
+              "score": 0.8455
+            }
+          ]
+        },
+        {
+          "id": "x-behavioral-cloning",
+          "type": "cross",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 2,
+          "all_papers_rank": null,
+          "hits": [
+            {
+              "chunk_id": "2003.06085#c37",
+              "paper_id": "2003.06085",
+              "section": "5 Experiments",
+              "score": 0.9342
+            },
+            {
+              "chunk_id": "2206.11795#c91",
+              "paper_id": "2206.11795",
+              "section": "E Foundation Model Behavioral Cloning > E.1 Foundation Model Architecture",
+              "score": 0.9098
+            },
+            {
+              "chunk_id": "2003.06085#c35",
+              "paper_id": "2003.06085",
+              "section": "4 Method > Stage 2: Goal-Directed Imitation of Novel Behaviors",
+              "score": 0.9073
+            },
+            {
+              "chunk_id": "2206.11795#c45",
+              "paper_id": "2206.11795",
+              "section": "4 Results > 4.6 Effect of Inverse Dynamics Model Quality on Behavioral Cloning",
+              "score": 0.898
+            },
+            {
+              "chunk_id": "2206.11795#c102",
+              "paper_id": "2206.11795",
+              "section": "F Behavioral Cloning Fine-Tuning",
+              "score": 0.8856
+            },
+            {
+              "chunk_id": "2206.11795#c94",
+              "paper_id": "2206.11795",
+              "section": "E Foundation Model Behavioral Cloning > E.3 Joint Hierarchical Action Space",
+              "score": 0.8794
+            },
+            {
+              "chunk_id": "2206.11795#c6",
+              "paper_id": "2206.11795",
+              "section": "1 Introduction",
+              "score": 0.8744
+            },
+            {
+              "chunk_id": "2206.11795#c46",
+              "paper_id": "2206.11795",
+              "section": "4 Results > 4.6 Effect of Inverse Dynamics Model Quality on Behavioral Cloning",
+              "score": 0.8644
+            }
+          ]
+        },
+        {
+          "id": "x-curriculum",
+          "type": "cross",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 2,
+          "all_papers_rank": 2,
+          "hits": [
+            {
+              "chunk_id": "1511.06279#c27",
+              "paper_id": "1511.06279",
+              "section": "3 Model > 3.2 Training",
+              "score": 0.8987
+            },
+            {
+              "chunk_id": "1710.01813#c32",
+              "paper_id": "1710.01813",
+              "section": "4 Neural Task Programming",
+              "score": 0.8473
+            },
+            {
+              "chunk_id": "1511.06279#c28",
+              "paper_id": "1511.06279",
+              "section": "3 Model > 3.2 Training",
+              "score": 0.8362
+            },
+            {
+              "chunk_id": "1511.06279#c52",
+              "paper_id": "1511.06279",
+              "section": "6 Appendix > 6.3 Additional experiment on addition generalization",
+              "score": 0.8258
+            },
+            {
+              "chunk_id": "1511.06279#c26",
+              "paper_id": "1511.06279",
+              "section": "3 Model > 3.2 Training",
+              "score": 0.8194
+            },
+            {
+              "chunk_id": "1511.06279#c4",
+              "paper_id": "1511.06279",
+              "section": "1 Introduction",
+              "score": 0.8102
+            },
+            {
+              "chunk_id": "2206.11795#c15",
+              "paper_id": "2206.11795",
+              "section": "2 Preliminaries and Related Work",
+              "score": 0.7915
+            },
+            {
+              "chunk_id": "1511.06279#c48",
+              "paper_id": "1511.06279",
+              "section": "5 Conclusion",
+              "score": 0.788
+            }
+          ]
+        },
+        {
+          "id": "x-decomposition",
+          "type": "cross",
+          "paper_rank": 1,
+          "section_rank": 2,
+          "gold_papers_found": 2,
+          "all_papers_rank": 2,
+          "hits": [
+            {
+              "chunk_id": "1803.01840#c33",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments",
+              "score": 0.9199
+            },
+            {
+              "chunk_id": "1710.01813#c6",
+              "paper_id": "1710.01813",
+              "section": "1 Introduction",
+              "score": 0.89
+            },
+            {
+              "chunk_id": "1710.01813#c15",
+              "paper_id": "1710.01813",
+              "section": "2 Background & Related work",
+              "score": 0.8895
+            },
+            {
+              "chunk_id": "1803.01840#c46",
+              "paper_id": "1803.01840",
+              "section": "5 Experiments > 5.3 Dial Domain > 5.3.1 Joint Space Dial Domain",
+              "score": 0.8871
+            },
+            {
+              "chunk_id": "1710.01813#c0",
+              "paper_id": "1710.01813",
+              "section": "Abstract",
+              "score": 0.8829
+            },
+            {
+              "chunk_id": "1803.01840#c58",
+              "paper_id": "1803.01840",
+              "section": "B Detailed Results",
+              "score": 0.8816
+            },
+            {
+              "chunk_id": "1710.01813#c4",
+              "paper_id": "1710.01813",
+              "section": "1 Introduction",
+              "score": 0.8768
+            },
+            {
+              "chunk_id": "1803.01840#c52",
+              "paper_id": "1803.01840",
+              "section": "6 Discussion",
+              "score": 0.8731
+            }
+          ]
+        },
+        {
+          "id": "x-real-robots",
+          "type": "cross",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 2,
+          "all_papers_rank": 2,
+          "hits": [
+            {
+              "chunk_id": "1710.01813#c36",
+              "paper_id": "1710.01813",
+              "section": "5 Experimental Setup",
+              "score": 0.8868
+            },
+            {
+              "chunk_id": "2003.06085#c46",
+              "paper_id": "2003.06085",
+              "section": "5 Experiments > 5.2 Real World Robot Manipulation Experiments",
+              "score": 0.8689
+            },
+            {
+              "chunk_id": "2003.06085#c55",
+              "paper_id": "2003.06085",
+              "section": "5 Experiments > 5.2 Real World Robot Manipulation Experiments > Evaluation of Real Robot Experiments",
+              "score": 0.8623
+            },
+            {
+              "chunk_id": "2003.06085#c48",
+              "paper_id": "2003.06085",
+              "section": "5 Experiments > 5.2 Real World Robot Manipulation Experiments",
+              "score": 0.8609
+            },
+            {
+              "chunk_id": "2003.06085#c59",
+              "paper_id": "2003.06085",
+              "section": "5 Experiments > 5.2 Real World Robot Manipulation Experiments > Evaluation of Real Robot Experiments",
+              "score": 0.8578
+            },
+            {
+              "chunk_id": "1710.01813#c42",
+              "paper_id": "1710.01813",
+              "section": "6 Experiment 1: Object Sorting",
+              "score": 0.855
+            },
+            {
+              "chunk_id": "2003.06085#c53",
+              "paper_id": "2003.06085",
+              "section": "5 Experiments > 5.2 Real World Robot Manipulation Experiments",
+              "score": 0.8492
+            },
+            {
+              "chunk_id": "2003.06085#c57",
+              "paper_id": "2003.06085",
+              "section": "5 Experiments > 5.2 Real World Robot Manipulation Experiments > Evaluation of Real Robot Experiments",
+              "score": 0.8473
+            }
+          ]
+        },
+        {
+          "id": "x-forgetting",
+          "type": "cross",
+          "paper_rank": 1,
+          "section_rank": 1,
+          "gold_papers_found": 2,
+          "all_papers_rank": 2,
+          "hits": [
+            {
+              "chunk_id": "2206.11795#c36",
+              "paper_id": "2206.11795",
+              "section": "4 Results > 4.4 Fine-Tuning with Reinforcement Learning",
+              "score": 0.8777
+            },
+            {
+              "chunk_id": "1511.06279#c44",
+              "paper_id": "1511.06279",
+              "section": "4 Experiments > 4.3 Learning new programs with a fixed core",
+              "score": 0.8572
+            },
+            {
+              "chunk_id": "2206.11795#c111",
+              "paper_id": "2206.11795",
+              "section": "G Reinforcement Learning Fine-Tuning > G.1 Reinforcement Learning Fine-Tuning Training Details",
+              "score": 0.8504
+            },
+            {
+              "chunk_id": "2206.11795#c41",
+              "paper_id": "2206.11795",
+              "section": "4 Results > 4.4 Fine-Tuning with Reinforcement Learning",
+              "score": 0.8414
+            },
+            {
+              "chunk_id": "2206.11795#c35",
+              "paper_id": "2206.11795",
+              "section": "4 Results > 4.4 Fine-Tuning with Reinforcement Learning",
+              "score": 0.8096
+            },
+            {
+              "chunk_id": "2206.11795#c70",
+              "paper_id": "2206.11795",
+              "section": "B Contractor Data > B.2 Contractor Contract",
+              "score": 0.8091
+            },
+            {
+              "chunk_id": "2206.11795#c14",
+              "paper_id": "2206.11795",
+              "section": "2 Preliminaries and Related Work",
+              "score": 0.808
+            },
+            {
+              "chunk_id": "2206.11795#c53",
+              "paper_id": "2206.11795",
+              "section": "A Collecting Internet Data > A.1 Initial Unclean Dataset Curation",
+              "score": 0.8068
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
