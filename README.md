@@ -53,12 +53,13 @@ For the web page and API:
 py -3.12 -m uv run uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
 
-Every `/api/ask` call spends API credit, so the server only listens on this machine: `--host 127.0.0.1` is uvicorn's
-default, and you should not change it. It also refuses requests whose `Host` header is not in `ALLOWED_HOSTS`
+Every `/api/ask` call spends API credit, so this command only listens on this machine: `--host 127.0.0.1` is
+uvicorn's default, and you should not change it; to serve others, use `python -m app.serve` (see Deploying). It also refuses requests whose `Host` header is not in `ALLOWED_HOSTS`
 (comma-separated, default `localhost,127.0.0.1,[::1]`; this blocks DNS rebinding) and `POST /api/ask` requests from
-another origin (403). For any use beyond your own machine, add your hostname to `ALLOWED_HOSTS` and set `API_TOKEN`:
-clients must then send it in the `X-API-Token` header (401 otherwise); the page has a field for it, kept in
-`sessionStorage` for the tab. Use HTTPS in front of the server, since the token is sent in the clear otherwise.
+another origin (403). For any use beyond your own machine, add your hostname to `ALLOWED_HOSTS` and set `API_TOKEN`
+(clients must then send it in the `X-API-Token` header, 401 otherwise; the page has a field for it, kept in
+`sessionStorage` for the tab) or the spend limits `ASK_LIMIT_PER_HOUR` and `ASK_LIMIT_PER_DAY`. Use HTTPS in front of
+the server, since the token is sent in the clear otherwise.
 
 Open **http://localhost:8000**. `GET /api/papers` lists the papers. `POST /api/ask` takes
 `{"question": "...", "k": 8, "verify": true, "agentic": false}` (question 1 to 1000 characters, `k` 1 to 20;
@@ -76,7 +77,30 @@ Settings come from the environment or a `.env` file at the repo root; see [.env.
 `ANTHROPIC_API_KEY`, `LLM_MODEL` (default `claude-opus-5-5`), `LLM_EFFORT` (default `medium`), `VERIFY` (default
 `true`), `VERIFY_MODEL` (default: same as `LLM_MODEL`), `VERIFY_EFFORT` (default `low`), `AGENTIC` (default `false`), `AGENT_ROUNDS` (default `3`), `RERANK` (`off` or `auto`, default `off`),
 `RERANK_MODEL` (default `cross-encoder/mmarco-mMiniLMv2-L12-H384-v1`), `RERANK_DEPTH` (default `30`), `EMBED` (`auto` or `off`),
-`DATA_DIR`, `ARXIV_DELAY_S`, `ALLOWED_HOSTS` and `API_TOKEN`.
+`DATA_DIR`, `ARXIV_DELAY_S`, `ALLOWED_HOSTS`, `API_TOKEN`, `ASK_LIMIT_PER_HOUR` and `ASK_LIMIT_PER_DAY` (both
+default `0`, no limit).
+
+## Deploying
+
+The `Dockerfile` builds an image with the papers already fetched and indexed (arXiv is only called at build time) and
+runs `python -m app.serve`, which listens on `0.0.0.0:$PORT` with proxy headers on. It refuses to start unless:
+
+- `API_TOKEN` is set, or both `ASK_LIMIT_PER_HOUR` (questions per visitor address) and `ASK_LIMIT_PER_DAY`
+  (questions in total) are, so strangers cannot spend your API credit without limit; over a limit, `/api/ask`
+  answers 429 with `Retry-After`. A public demo would use the limits, since visitors have no token.
+- `ALLOWED_HOSTS` names the public hostname.
+
+```bash
+docker build -t arxiv-paper-rag .                                   # BM25 only, small image
+docker build -t arxiv-paper-rag --build-arg EXTRAS="--extra embed" .   # hybrid search (adds PyTorch)
+docker run -p 8000:8000 -e ANTHROPIC_API_KEY=... -e ALLOWED_HOSTS=rag.example.org \
+  -e ASK_LIMIT_PER_HOUR=10 -e ASK_LIMIT_PER_DAY=200 arxiv-paper-rag
+```
+
+Any host that runs a container works (Fly.io, Render, Railway, Cloud Run); put HTTPS in front, and set
+`FORWARDED_ALLOW_IPS` to the proxy's address so the limits count visitors rather than the proxy. The limits are kept
+in memory, so run one instance. Vercel's Python functions are not a good fit: the app is a long-running server and the
+optional embedder needs PyTorch.
 
 ## How it works
 
@@ -105,7 +129,8 @@ Settings come from the environment or a `.env` file at the repo root; see [.env.
    Passages and the answer are both treated as untrusted text. At most 40 pairs are graded per answer.
 
 ```
-app/        fetch, parse, search, answer, CLI (cli.py), API (main.py), static page (static/)
+app/        fetch, parse, search, answer, claim check, agentic search (agent.py), PDF lookup (pdflocate.py),
+            CLI (cli.py), API (main.py), public server (serve.py), PaperQA2 adapter (paperqa2.py), page (static/)
 eval/       question set, baseline numbers and their README
 tests/      pytest suite
 data/       downloaded papers and the index (gitignored)
@@ -175,7 +200,10 @@ Tiers follow the project plan.
 - **Tier 3: reader integration.**
   - [x] A citation opens the PDF at its page with the passage highlighted (built in, with PyMuPDF)
   - [ ] Share the viewer with the Semantic PDF search reader project
-- **Tier 4: ship.** Public deployment, a writeup with the results table, a demo video.
+- **Tier 4: ship.**
+  - [x] Container image and a guarded server (token or spend limits, public host) for deployment
+  - [ ] Deploy it (needs a hosting account and an API key with a spend cap)
+  - [ ] A writeup with the results table, and a demo video
 - Later: users add their own arXiv ids; a daily digest of new papers in chosen arXiv categories.
 
 ## License

@@ -36,6 +36,9 @@ class Settings(BaseSettings):
     allowed_hosts: Annotated[list[str], NoDecode] = ["localhost", "127.0.0.1", "[::1]"]
     # when set, POST /api/ask needs this value in the X-API-Token header
     api_token: SecretStr | None = None
+    # spend limits for POST /api/ask (0 = no limit): questions per client address per hour, and per day in total
+    ask_limit_per_hour: int = 0
+    ask_limit_per_day: int = 0
 
     @field_validator("allowed_hosts", mode="before")
     @classmethod

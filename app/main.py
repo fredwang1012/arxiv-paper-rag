@@ -15,6 +15,7 @@ from app.answer import Answer, ask
 from app.config import settings
 from app.corpus import Corpus
 from app.llm import LLM, AnthropicLLM, LLMError, LLMRefusal, LLMTransient, LLMUnavailable, error_message
+from app.ratelimit import RateLimiter
 
 STATIC = Path(__file__).parent / "static"
 
@@ -39,6 +40,17 @@ app.add_middleware(_SettingsHosts)
 _lock = threading.Lock()
 _corpus: Corpus | None = None
 _llm: LLM | None = None
+_limiter: RateLimiter | None = None
+
+
+def get_limiter() -> RateLimiter:
+    """Rebuilt when the limits change (tests and settings reloads), keeping counts otherwise."""
+    global _limiter
+    with _lock:
+        limits = (settings.ask_limit_per_hour, settings.ask_limit_per_day)
+        if _limiter is None or (_limiter.per_client_hour, _limiter.per_day) != limits:
+            _limiter = RateLimiter(*limits)
+        return _limiter
 
 
 def get_corpus() -> Corpus:
@@ -118,6 +130,11 @@ def guard_ask(request: Request, x_api_token: str | None = Header(default=None)) 
         expected = settings.api_token.get_secret_value().encode()
         if x_api_token is None or not secrets.compare_digest(x_api_token.encode(), expected):
             raise HTTPException(401, "A valid X-API-Token header is required.")
+    if settings.ask_limit_per_hour or settings.ask_limit_per_day:
+        wait = get_limiter().check(request.client.host if request.client else "unknown")
+        if wait is not None:
+            raise HTTPException(429, "Too many questions; try again later.",
+                                headers={"Retry-After": str(max(1, int(wait) + 1))})
 
 
 @app.post("/api/ask", dependencies=[Depends(guard_ask)])
