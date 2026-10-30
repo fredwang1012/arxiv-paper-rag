@@ -17,6 +17,8 @@ Motion Grammar (Dantam & Stilman) is on the course list but is not on arXiv, so 
 - **Claims are checked.** A second model call grades every cited sentence against each passage it marks:
   supported, partial or unsupported, with a one-line reason. A quote can be in the passage while the sentence
   around it says more than the passage does; this catches that.
+- **Jump to the passage.** Each citation is looked up in the paper's PDF. The CLI prints its page; on the web page,
+  "Open PDF at p. N" opens the PDF at that page with the passage highlighted.
 - **Agentic search (optional).** With `--agentic` (or `AGENTIC=true`), the model sees the first results and runs
   up to 8 follow-up searches of its own, on the whole list or one paper, before the answer is written. Off by default
   until the comparison numbers are in.
@@ -63,7 +65,9 @@ Open **http://localhost:8000**. `GET /api/papers` lists the papers. `POST /api/a
 `agentic` defaults to the `AGENTIC` setting) and returns
 `{text, references, citations, unresolved_markers, unmarked_citations, support, verify_error, searches}`. `support` has one
 `{claim, passage, verdict, reason}` per cited sentence and passage; if the check itself fails, `verify_error` says
-why and the answer is still returned. With no credentials at all (no
+why and the answer is still returned. Each citation also has `pdf_page` (or `null`). `GET
+/api/papers/{id}/pdf?quote=...&chunk=...` returns the paper's PDF with the quote, or failing that the cited chunk,
+highlighted; only ids on the reading list are served. With no credentials at all (no
 `ANTHROPIC_API_KEY`, no `ant auth login` profile) or when the API is unreachable it returns 503 with a message. A
 model refusal is 422 with `{"error": "refused", "detail": ...}`, a bad request is 422 with
 `{"error": "invalid_request", "detail": [{"loc": ..., "msg": ...}]}`, and any other model error is 502.
@@ -93,7 +97,10 @@ Settings come from the environment or a `.env` file at the repo root; see [.env.
    untrusted text and that it must not follow instructions inside them.
 7. **Check quotes.** Each citation is mapped back to its paper and section, and its quote is looked for in that
    passage.
-8. **Check claims.** The answer is split into sentences; each sentence with a `[n]` marker is sent with the passages
+8. **Find it in the PDF.** The quote is searched for in the PDF's text (ligatures and line-end hyphens normalised);
+   when the LaTeX-derived quote does not match exactly, six-word windows of the quote and then of the passage are
+   tried, and the page with the most matches wins.
+9. **Check claims.** The answer is split into sentences; each sentence with a `[n]` marker is sent with the passages
    it marks to a second call, which grades every (sentence, passage) pair as supported, partial or unsupported.
    Passages and the answer are both treated as untrusted text. At most 40 pairs are graded per answer.
 
@@ -143,7 +150,8 @@ No test uses the network or a paid API; arXiv responses are recorded or built in
 - Only the five arXiv papers are searchable. Motion Grammar is not on arXiv.
 - Answers need the Anthropic API and cost money per question; `LLM_EFFORT` trades cost for care.
 - A section path is only as good as the parser. LaTeX with unusual macros can land text under the wrong heading.
-- Equations and tables are kept as source text, which embeds and quotes poorly.
+- Equations and tables are kept as source text, which embeds and quotes poorly, and is hard to find in the PDF: such
+  citations may open at the right page without a highlight, or at the first page.
 - The claim check is the model grading its own citations. It catches overreach, but it can be wrong too, and it
   only judges the passages the answer cites, not ones it should have cited.
 - Without the `embed` extra, search is keyword-based only.
@@ -160,7 +168,9 @@ Tiers follow the project plan.
   - [x] Agentic multi-step retrieval: the model searches again and refines its query (built; not yet measured)
   - [x] Reranking (built, off by default; the retrieval eval scores it as `+rerank` rows once the model can load)
   - [ ] Compare against plain RAG and PaperQA2 on the same papers and questions
-- **Tier 3: reader integration.** A citation opens the PDF at the highlighted passage, via semantic-pdf-reader.
+- **Tier 3: reader integration.**
+  - [x] A citation opens the PDF at its page with the passage highlighted (built in, with PyMuPDF)
+  - [ ] Share the viewer with the Semantic PDF search reader project
 - **Tier 4: ship.** Public deployment, a writeup with the results table, a demo video.
 - Later: users add their own arXiv ids; a daily digest of new papers in chosen arXiv categories.
 

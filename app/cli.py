@@ -95,7 +95,8 @@ def format_answer(a: Answer) -> str:
             first = next((c for c in a.citations if c.paper_id == r.paper_id and c.section == r.section), None)
             if first and first.quote:
                 warn = "" if first.quote_found else " ⚠ quote not found in the passage"
-                lines.append(f'    "{first.quote}"{warn}')
+                page = f" (PDF p. {first.pdf_page})" if first.pdf_page else ""
+                lines.append(f'    "{first.quote}"{page}{warn}')
     if a.unresolved_markers:
         marks = ", ".join(f"[{n}]" for n in a.unresolved_markers)
         lines += ["", f"Warning: the answer uses {marks} with no matching citation."]

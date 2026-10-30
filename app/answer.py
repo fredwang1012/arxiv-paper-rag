@@ -1,9 +1,10 @@
 """Ask a question: search, number the passages, call the LLM, map its citations back to papers and sections, and
 optionally check that each cited passage supports the sentence that cites it."""
+import logging
 import re
 from dataclasses import dataclass, field
 
-from app import agent
+from app import agent, arxiv, pdflocate
 from app.config import settings
 from app.corpus import Corpus
 from app.llm import LLM, ClaimCheck, LLMError, Passage, RawAnswer, RawVerification, error_message
@@ -22,6 +23,7 @@ _SENTENCE_END = re.compile(r"(?<=[.!?])\s+(?=[A-Z0-9(\"'*\-•<])|(?<=\][.!?])\s
 _ONLY_MARKERS = re.compile(r"^(?:\s*\[[\d\s,–-]+\]\s*[.,;:]?)+$")
 MAX_CHECKS = 40  # claim-passage pairs per answer: bounds the cost of the check
 UNCHECKED = "unchecked"
+log = logging.getLogger(__name__)
 
 
 @dataclass
@@ -35,6 +37,7 @@ class Citation:
     quote: str
     quote_found: bool
     passage: int  # the 1-based passage number it came from
+    pdf_page: int | None = None  # 1-based page of the paper's PDF holding the quote (or the passage), if found
 
 
 @dataclass
@@ -180,6 +183,16 @@ def build_passages(question: str, corpus: Corpus, k: int) -> list[Passage]:
     return [make_passage(corpus, n, hit) for n, hit in enumerate(corpus.search(question, k), start=1)]
 
 
+def pdf_page(paper_id: str, quote: str, passage: str) -> int | None:
+    """Where the citation is in the downloaded PDF; None when there is no PDF, no match, or the PDF cannot be read."""
+    try:
+        loc = pdflocate.locate(arxiv.paper_dir(paper_id) / "paper.pdf", quote, passage)
+    except Exception as e:  # a damaged PDF must not cost the answer
+        log.warning("could not search the PDF of %s (%s)", paper_id, type(e).__name__)
+        return None
+    return loc.page if loc else None
+
+
 def map_citations(raw: RawAnswer, passages: list[Passage], corpus: Corpus) -> list[Citation]:
     out = []
     for rc in raw.citations:
@@ -188,7 +201,7 @@ def map_citations(raw: RawAnswer, passages: list[Passage], corpus: Corpus) -> li
         p = passages[rc.passage - 1]
         meta = corpus.paper(p.chunk.paper_id)
         out.append(Citation(meta.id, meta.title, meta.authors, meta.year, p.section, p.chunk.id, rc.quote,
-                            quote_in(rc.quote, p.chunk.text), rc.passage))
+                            quote_in(rc.quote, p.chunk.text), rc.passage, pdf_page(meta.id, rc.quote, p.chunk.text)))
     return out
 
 

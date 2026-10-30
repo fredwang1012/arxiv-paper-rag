@@ -41,6 +41,7 @@
   .meta { color: var(--muted); }
   blockquote { margin: 6px 0 0; padding-left: 10px; border-left: 3px solid var(--border); }
   .warn { color: var(--warn); }
+  a.pdf { display: inline-block; margin-top: 6px; color: var(--accent); font-size: .9rem; }
   .ok { color: var(--ok); }
   .bad { color: var(--error); }
   ul#support { padding-left: 0; list-style: none; margin: 0; }
@@ -105,6 +106,17 @@ function authorsOf(list) {
   return names.length === 2 ? names[0] + " & " + names[1] : names[0] + " et al.";
 }
 
+// Opens the PDF at the cited page with the passage highlighted; without a known page it opens at the start.
+function pdfLink(cit) {
+  const params = new URLSearchParams({ quote: cit.quote || "", chunk: cit.chunk_id });
+  const a = el("a", "pdf", cit.pdf_page ? "Open PDF at p. " + cit.pdf_page : "Open PDF");
+  a.href = "/api/papers/" + encodeURIComponent(cit.paper_id) + "/pdf?" + params.toString() +
+    (cit.pdf_page ? "#page=" + cit.pdf_page : "");
+  a.target = "_blank";
+  a.rel = "noopener";
+  return a;
+}
+
 function render(data) {
   $("answer").textContent = data.text;
   $("searches").hidden = data.searches.length === 0;
@@ -125,6 +137,7 @@ function render(data) {
       if (!cit.quote_found) q.append(el("span", "warn", " ⚠ quote not found in the passage"));
       li.append(q);
     }
+    if (cit) li.append(pdfLink(cit));
     refs.append(li);
   }
   renderSupport(data);
