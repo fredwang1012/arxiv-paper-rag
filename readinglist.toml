@@ -1,0 +1,22 @@
+# The fixed reading list (CSC2626 Week 5). Ids are verified against arxiv.org/abs.
+# Motion Grammar (Dantam & Stilman) is not on arXiv, so it is not listed.
+
+[[paper]]
+id = "1511.06279"
+note = "Neural Programmer-Interpreters (Reed & de Freitas)"
+
+[[paper]]
+id = "1710.01813"
+note = "Neural Task Programming (Xu et al.)"
+
+[[paper]]
+id = "1803.01840"
+note = "TACO (Shiarlis et al.)"
+
+[[paper]]
+id = "2003.06085"
+note = "Generalization Through Imitation, GTI (Mandlekar et al.)"
+
+[[paper]]
+id = "2206.11795"
+note = "Video PreTraining, VPT (Baker et al.)"
