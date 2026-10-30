@@ -60,7 +60,20 @@ py -3.12 -m uv run python -m app.evaluate                       # retrieval only
 py -3.12 -m uv run python -m app.evaluate --k 1 3 5 8 --json out.json
 py -3.12 -m uv run python -m app.evaluate --answers              # one LLM call per question, asks first
 py -3.12 -m uv run python -m app.evaluate --answers --yes --json out.json
+py -3.12 -m uv run python -m app.evaluate --answers --systems plain agentic          # compare two systems
+py -3.12 -m uv run --with paper-qa==2026.8.12 python -m app.evaluate --answers --systems plain agentic paperqa2
 ```
+
+`--systems` picks what answers the questions; the answers JSON then holds one result per system, and the table one
+row per system:
+
+- `plain`: one search on the question, then the answer (the default).
+- `agentic`: the same first search, then up to `AGENT_ROUNDS` turns of follow-up searches chosen by the model.
+- `paperqa2`: [PaperQA2](https://github.com/Future-House/paper-qa)'s own agent over the same PDFs, with the same
+  model (through LiteLLM), the same multilingual-e5 embedder and a local manifest, so it looks nothing up online. Its
+  answer cites contexts by id; those become numbered passages and `[n]` markers, so citation precision and recall,
+  keyword hits and the claim check are computed the same way. PaperQA2 does not quote, so its quote-found rate is
+  n/a. paper-qa is not a project dependency: `uv run --with` adds it for that run only.
 
 Hybrid retrieval is scored only when the optional embedder is installed
 (`py -3.12 -m uv sync --extra embed`); otherwise the run says it skipped it. With the same extra, each retriever also

@@ -119,8 +119,12 @@ the labels changed are in [eval/README.md](eval/README.md).
 
 ```bash
 py -3.12 -m uv run python -m app.evaluate                # retrieval only, free
-py -3.12 -m uv run python -m app.evaluate --answers      # one model call per question; asks first
+py -3.12 -m uv run python -m app.evaluate --answers      # model calls per question; asks first
+py -3.12 -m uv run python -m app.evaluate --answers --systems plain agentic   # side by side
 ```
+
+`--systems plain agentic paperqa2` compares this project's one-shot and agentic modes with PaperQA2 on the same
+questions and metrics; see [eval/README.md](eval/README.md).
 
 Baseline, run on 2026-10-25 over 380 chunks (all parsed from LaTeX), hybrid with `intfloat/multilingual-e5-small`:
 
@@ -167,7 +171,7 @@ Tiers follow the project plan.
   - [x] Claim check: each cited passage is graded against the sentence that cites it
   - [x] Agentic multi-step retrieval: the model searches again and refines its query (built; not yet measured)
   - [x] Reranking (built, off by default; the retrieval eval scores it as `+rerank` rows once the model can load)
-  - [ ] Compare against plain RAG and PaperQA2 on the same papers and questions
+  - [x] Compare against plain RAG and PaperQA2 on the same papers and questions (harness built; not yet run)
 - **Tier 3: reader integration.**
   - [x] A citation opens the PDF at its page with the passage highlighted (built in, with PyMuPDF)
   - [ ] Share the viewer with the Semantic PDF search reader project
