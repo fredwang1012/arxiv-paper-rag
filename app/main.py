@@ -60,6 +60,7 @@ def get_llm() -> LLM:
 class AskRequest(BaseModel):
     question: str = Field(min_length=1, max_length=1000)
     k: int = Field(default=8, ge=1, le=20)
+    verify: bool = True  # also check each citation supports its sentence (a second model call; off when VERIFY=false)
 
 
 def answer_json(a: Answer) -> dict:
@@ -69,6 +70,8 @@ def answer_json(a: Answer) -> dict:
         "citations": [c.__dict__ for c in a.citations],
         "unresolved_markers": a.unresolved_markers,
         "unmarked_citations": a.unmarked_citations,
+        "support": [s.__dict__ for s in a.support],
+        "verify_error": a.verify_error,
     }
 
 
@@ -117,7 +120,7 @@ def guard_ask(request: Request, x_api_token: str | None = Header(default=None)) 
 @app.post("/api/ask", dependencies=[Depends(guard_ask)])
 def ask_endpoint(req: AskRequest) -> dict:
     try:
-        return answer_json(ask(req.question, get_corpus(), get_llm(), req.k))
+        return answer_json(ask(req.question, get_corpus(), get_llm(), req.k, verify=settings.verify and req.verify))
     except LLMUnavailable as e:
         raise HTTPException(503, error_message(e))
     except LLMTransient as e:

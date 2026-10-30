@@ -14,7 +14,8 @@ from app import arxiv, cli, main
 from app import llm as llm_mod
 from app.answer import ask
 from app.config import Settings, settings
-from app.llm import AnthropicLLM, LLMError, LLMRefusal, LLMTransient, LLMUnavailable, RawAnswer, RawCitation
+from app.llm import (AnthropicLLM, LLMError, LLMRefusal, LLMTransient, LLMUnavailable, RawAnswer, RawCitation,
+                     RawVerdict, RawVerification)
 from tests.test_answer import FakeLLM, make_corpus
 
 
@@ -97,9 +98,14 @@ def test_api_ask(monkeypatch):
     r = client(good_llm(), monkeypatch).post("/api/ask", json={"question": "widgets hum", "k": 3})
     assert r.status_code == 200
     body = r.json()
-    assert set(body) == {"text", "references", "citations", "unresolved_markers", "unmarked_citations"}
+    assert set(body) == {"text", "references", "citations", "unresolved_markers", "unmarked_citations", "support",
+                         "verify_error"}
     assert body["references"][0]["passages"] == [1] and body["unresolved_markers"] == [2]
     assert body["citations"][0]["quote_found"] is True
+    # [2] is marked but not in the model's citations: it is still checked, since passage 2 exists
+    assert [(s["passage"], s["verdict"]) for s in body["support"]] == [(1, "supported"), (2, "supported")]
+    assert body["support"][0]["claim"] == "Widgets hum [1] and fly [2]."
+    assert body["verify_error"] is None
 
 
 @pytest.mark.parametrize("payload", [
@@ -387,3 +393,54 @@ def test_page_sends_token_from_session_storage_not_url():
     html = (Path(main.STATIC) / "index.html").read_text(encoding="utf-8")
     assert "X-API-Token" in html and "sessionStorage" in html
     assert "localStorage" not in html and "location" not in html
+
+
+# ---------- claim check on the surfaces ----------
+
+def _graded_llm():
+    return FakeLLM(RawAnswer(answer="Widgets hum [1]. They fly [1].", citations=[RawCitation(passage=1, quote="hum")]),
+                   RawVerification(verdicts=[
+                       RawVerdict(claim=1, passage=1, verdict="supported", reason=""),
+                       RawVerdict(claim=2, passage=1, verdict="unsupported", reason="flying is never mentioned")]))
+
+
+def test_cli_prints_the_claim_check(capsys):
+    make_corpus()
+    assert cli.main(["ask", "widgets hum"], llm=_graded_llm()) == 0
+    out = capsys.readouterr().out
+    assert "Claim check: 1 of 2 cited passages support their sentence" in out
+    assert "✓ [1] supported: Widgets hum [1]." in out
+    assert "✗ [1] unsupported: They fly [1]. (flying is never mentioned)" in out
+
+
+def test_cli_no_verify_and_setting_off_skip_the_check(capsys, monkeypatch):
+    make_corpus()
+    llm = _graded_llm()
+    assert cli.main(["ask", "widgets hum", "--no-verify"], llm=llm) == 0
+    monkeypatch.setattr(settings, "verify", False)
+    assert cli.main(["ask", "widgets hum"], llm=llm) == 0
+    assert llm.verify_calls == [] and "Claim check" not in capsys.readouterr().out
+
+
+def test_cli_reports_a_failed_check_but_still_answers(capsys):
+    make_corpus()
+    llm = FakeLLM(RawAnswer(answer="Widgets hum [1].", citations=[]), LLMTransient("down"))
+    assert cli.main(["ask", "widgets hum"], llm=llm) == 0
+    out = capsys.readouterr().out
+    assert "Widgets hum [1]." in out and "Claim check failed:" in out and "try again" in out
+
+
+def test_api_verify_flag_and_failed_check(monkeypatch):
+    make_corpus()
+    llm = _graded_llm()
+    body = client(llm, monkeypatch).post("/api/ask", json={"question": "widgets hum", "verify": False}).json()
+    assert body["support"] == [] and llm.verify_calls == []
+    llm = FakeLLM(RawAnswer(answer="Widgets hum [1].", citations=[]), LLMRefusal("no"))
+    r = client(llm, monkeypatch).post("/api/ask", json={"question": "widgets hum"})
+    assert r.status_code == 200 and r.json()["support"] == [] and "declined" in r.json()["verify_error"]
+
+
+def test_page_renders_the_claim_check_as_text_only():
+    html = (main.STATIC / "index.html").read_text(encoding="utf-8")
+    assert 'id="support"' in html and "renderSupport" in html
+    assert "innerHTML" not in html

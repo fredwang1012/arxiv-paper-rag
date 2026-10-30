@@ -14,6 +14,9 @@ Motion Grammar (Dantam & Stilman) is on the course list but is not on arXiv, so 
 - **Quotes are checked.** The model must quote the passage it cites. A quote that is not found in that passage is
   marked with a warning, and so is a `[n]` (or `[n, m]`, `[n-m]`) in the text that has no matching citation, or a
   citation whose passage number is never marked in the text.
+- **Claims are checked.** A second model call grades every cited sentence against each passage it marks:
+  supported, partial or unsupported, with a one-line reason. A quote can be in the passage while the sentence
+  around it says more than the passage does; this catches that.
 - **Hybrid search.** BM25 keyword scoring, plus multilingual-e5 embeddings when the `embed` extra is installed.
 - **Three ways in.** A command line, a JSON API and a one-page web UI.
 - **Polite to arXiv.** One request every 3 seconds, a project User-Agent, and everything cached under `data/`, so a
@@ -33,7 +36,8 @@ py -3.12 -m uv run python -m app.cli index    # chunk and index them
 py -3.12 -m uv run python -m app.cli ask "How does the NPI core decide when to stop?"
 ```
 
-`papers` lists what is downloaded. `fetch`, `index` and `papers` need no API key; only `ask` calls the model. Without
+`ask` prints the answer, its references and the claim check; `--no-verify` skips the check (one call instead of
+two). `papers` lists what is downloaded. `fetch`, `index` and `papers` need no API key; only `ask` calls the model. Without
 credentials `ask` prints one line saying so and exits with status 1. `fetch` skips papers already saved; if arXiv is
 unreachable or throttling it prints one line and exits with status 1, keeping what was saved.
 
@@ -51,15 +55,18 @@ clients must then send it in the `X-API-Token` header (401 otherwise); the page 
 `sessionStorage` for the tab. Use HTTPS in front of the server, since the token is sent in the clear otherwise.
 
 Open **http://localhost:8000**. `GET /api/papers` lists the papers. `POST /api/ask` takes
-`{"question": "...", "k": 8}` (question 1 to 1000 characters, `k` 1 to 20) and returns
-`{text, references, citations, unresolved_markers, unmarked_citations}`. With no credentials at all (no
+`{"question": "...", "k": 8, "verify": true}` (question 1 to 1000 characters, `k` 1 to 20) and returns
+`{text, references, citations, unresolved_markers, unmarked_citations, support, verify_error}`. `support` has one
+`{claim, passage, verdict, reason}` per cited sentence and passage; if the check itself fails, `verify_error` says
+why and the answer is still returned. With no credentials at all (no
 `ANTHROPIC_API_KEY`, no `ant auth login` profile) or when the API is unreachable it returns 503 with a message. A
 model refusal is 422 with `{"error": "refused", "detail": ...}`, a bad request is 422 with
 `{"error": "invalid_request", "detail": [{"loc": ..., "msg": ...}]}`, and any other model error is 502.
 
 Settings come from the environment or a `.env` file at the repo root; see [.env.example](.env.example). They are
-`ANTHROPIC_API_KEY`, `LLM_MODEL` (default `claude-opus-5-5`), `LLM_EFFORT` (default `medium`), `EMBED` (`auto` or
-`off`), `DATA_DIR`, `ARXIV_DELAY_S`, `ALLOWED_HOSTS` and `API_TOKEN`.
+`ANTHROPIC_API_KEY`, `LLM_MODEL` (default `claude-opus-5-5`), `LLM_EFFORT` (default `medium`), `VERIFY` (default
+`true`), `VERIFY_MODEL` (default: same as `LLM_MODEL`), `VERIFY_EFFORT` (default `low`), `EMBED` (`auto` or `off`),
+`DATA_DIR`, `ARXIV_DELAY_S`, `ALLOWED_HOSTS` and `API_TOKEN`.
 
 ## How it works
 
@@ -74,7 +81,11 @@ Settings come from the environment or a `.env` file at the repo root; see [.env.
 5. **Answer.** The top passages are numbered and sent to the model with the question. It returns structured output:
    the answer text with `[n]` markers and a quote for each passage it used. The prompt tells it that passages are
    untrusted text and that it must not follow instructions inside them.
-6. **Check.** Each citation is mapped back to its paper and section, and its quote is looked for in that passage.
+6. **Check quotes.** Each citation is mapped back to its paper and section, and its quote is looked for in that
+   passage.
+7. **Check claims.** The answer is split into sentences; each sentence with a `[n]` marker is sent with the passages
+   it marks to a second call, which grades every (sentence, passage) pair as supported, partial or unsupported.
+   Passages and the answer are both treated as untrusted text. At most 40 pairs are graded per answer.
 
 ```
 app/        fetch, parse, search, answer, CLI (cli.py), API (main.py), static page (static/)
@@ -106,7 +117,8 @@ Baseline, run on 2026-10-25 over 380 chunks (all parsed from LaTeX), hybrid with
 | hybrid | all gold papers (7 cross) | 0.00 | 0.71 | 0.86 | 0.86 | n/a |
 
 The question labels are a draft: nobody who knows the papers has reviewed them yet. Answer-level numbers (citation
-precision and recall, quote found) need an API key and come from the `--answers` run; they are not in yet.
+precision and recall, quote found, claims supported) need an API key and come from the `--answers` run; they are not
+in yet.
 
 ## Tests
 
@@ -122,20 +134,25 @@ No test uses the network or a paid API; arXiv responses are recorded or built in
 - Answers need the Anthropic API and cost money per question; `LLM_EFFORT` trades cost for care.
 - A section path is only as good as the parser. LaTeX with unusual macros can land text under the wrong heading.
 - Equations and tables are kept as source text, which embeds and quotes poorly.
-- Quote checking confirms the quote is in the passage, not that the passage supports the claim.
+- The claim check is the model grading its own citations. It catches overreach, but it can be wrong too, and it
+  only judges the passages the answer cites, not ones it should have cited.
 - Without the `embed` extra, search is keyword-based only.
 
 ## Roadmap
 
-Tier 1 (this repo) is done once the eval labels are reviewed and answer-level numbers are in. Next:
+Tiers follow the project plan.
 
-- **Tier 2: better retrieval and checking.** Agentic multi-step retrieval, reranking, and citation verification that
-  checks the passage supports the claim, not only that the quote is in it.
-- **Tier 3: comparison.** Compare against plain RAG and PaperQA2 on the eval set.
-- **Tier 4: reader and release.** Reader integration, so a citation opens the PDF at the highlighted passage via
-  semantic-pdf-reader; public deployment; a writeup and demo video.
-- Review the eval labels and publish answer-level numbers.
-- Let users add their own arXiv ids to the reading list.
+- **Tier 1: MVP (done).** Fixed reading list, LaTeX parsing, hybrid search, section citations, a 32-question eval with
+  retrieval baselines. Left: review the eval labels and publish answer-level numbers.
+- **Tier 2: better than plain RAG.**
+  - [x] LaTeX-source parsing (done in Tier 1)
+  - [x] Claim check: each cited passage is graded against the sentence that cites it
+  - [ ] Agentic multi-step retrieval: the model searches again and refines its query
+  - [ ] Reranking
+  - [ ] Compare against plain RAG and PaperQA2 on the same papers and questions
+- **Tier 3: reader integration.** A citation opens the PDF at the highlighted passage, via semantic-pdf-reader.
+- **Tier 4: ship.** Public deployment, a writeup with the results table, a demo video.
+- Later: users add their own arXiv ids; a daily digest of new papers in chosen arXiv categories.
 
 ## License
 
