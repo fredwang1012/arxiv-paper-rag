@@ -38,10 +38,7 @@ class Pool:
         if paper is not None and paper not in self.corpus.metas:
             return f"Unknown paper id {paper!r}."
         self.searches.append(f"{paper}: {query}" if paper else query)
-        hits = self.corpus.search(query, len(self.corpus.chunks) if paper else PER_SEARCH)
-        if paper:
-            hits = [h for h in hits if h.chunk.paper_id == paper][:PER_SEARCH]
-        return render_results(self.add(hits))
+        return render_results(self.add(self.corpus.search(query, PER_SEARCH, paper)))
 
 
 def gather(question: str, corpus: Corpus, llm: LLM, k: int, rounds: int, make_passage) -> tuple[list[Passage], list[str]]:

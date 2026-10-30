@@ -21,6 +21,7 @@ Motion Grammar (Dantam & Stilman) is on the course list but is not on arXiv, so 
   up to 8 follow-up searches of its own, on the whole list or one paper, before the answer is written. Off by default
   until the comparison numbers are in.
 - **Hybrid search.** BM25 keyword scoring, plus multilingual-e5 embeddings when the `embed` extra is installed.
+  An optional cross-encoder reranker (`RERANK=auto`, same extra) reorders the top 30 candidates.
 - **Three ways in.** A command line, a JSON API and a one-page web UI.
 - **Polite to arXiv.** One request every 3 seconds, a project User-Agent, and everything cached under `data/`, so a
   paper is downloaded once.
@@ -69,7 +70,8 @@ model refusal is 422 with `{"error": "refused", "detail": ...}`, a bad request i
 
 Settings come from the environment or a `.env` file at the repo root; see [.env.example](.env.example). They are
 `ANTHROPIC_API_KEY`, `LLM_MODEL` (default `claude-opus-5-5`), `LLM_EFFORT` (default `medium`), `VERIFY` (default
-`true`), `VERIFY_MODEL` (default: same as `LLM_MODEL`), `VERIFY_EFFORT` (default `low`), `AGENTIC` (default `false`), `AGENT_ROUNDS` (default `3`), `EMBED` (`auto` or `off`),
+`true`), `VERIFY_MODEL` (default: same as `LLM_MODEL`), `VERIFY_EFFORT` (default `low`), `AGENTIC` (default `false`), `AGENT_ROUNDS` (default `3`), `RERANK` (`off` or `auto`, default `off`),
+`RERANK_MODEL` (default `cross-encoder/mmarco-mMiniLMv2-L12-H384-v1`), `RERANK_DEPTH` (default `30`), `EMBED` (`auto` or `off`),
 `DATA_DIR`, `ARXIV_DELAY_S`, `ALLOWED_HOSTS` and `API_TOKEN`.
 
 ## How it works
@@ -81,7 +83,8 @@ Settings come from the environment or a `.env` file at the repo root; see [.env.
 3. **Chunks.** Each section is split into chunks of about 900 characters (max 1400). A chunk remembers its section path.
 4. **Search.** Chunks are scored with BM25Plus, scaled by the highest score. With embeddings, a chunk also gets a
    cosine similarity against the query, combined as 0.6 cosine + 0.4 BM25. Without them, a chunk must share a query
-   term to count as a hit.
+   term to count as a hit. With `RERANK=auto`, the top `RERANK_DEPTH` hits are rescored by a cross-encoder that reads
+   the query and the chunk together, and the top k of that order are kept.
 5. **Search again (agentic only).** The model gets the first results and a `search(query, paper?)` tool. For up to
    `AGENT_ROUNDS` turns it can run follow-up searches (5 passages each, 8 searches at most); new passages join a pool
    of at most 16, numbered in the order found.
@@ -155,7 +158,7 @@ Tiers follow the project plan.
   - [x] LaTeX-source parsing (done in Tier 1)
   - [x] Claim check: each cited passage is graded against the sentence that cites it
   - [x] Agentic multi-step retrieval: the model searches again and refines its query (built; not yet measured)
-  - [ ] Reranking
+  - [x] Reranking (built, off by default; the retrieval eval scores it as `+rerank` rows once the model can load)
   - [ ] Compare against plain RAG and PaperQA2 on the same papers and questions
 - **Tier 3: reader integration.** A citation opens the PDF at the highlighted passage, via semantic-pdf-reader.
 - **Tier 4: ship.** Public deployment, a writeup with the results table, a demo video.
