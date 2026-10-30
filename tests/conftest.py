@@ -18,3 +18,5 @@ def _isolated_settings(monkeypatch, tmp_path):
     # TestClient talks to the host "testserver"
     monkeypatch.setattr(settings, "allowed_hosts", ["testserver", "localhost", "127.0.0.1", "[::1]"])
     monkeypatch.setattr(settings, "api_token", None)
+    monkeypatch.setattr(settings, "ask_limit_per_hour", 0)
+    monkeypatch.setattr(settings, "ask_limit_per_day", 0)
