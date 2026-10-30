@@ -3,12 +3,13 @@ import secrets
 import threading
 from pathlib import Path
 
-from fastapi import Depends, FastAPI, Header, HTTPException, Request
+from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, Response
 from pydantic import BaseModel, Field
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
+from app import arxiv, pdflocate
 from app import corpus as corpus_mod
 from app.answer import Answer, ask
 from app.config import settings
@@ -133,6 +134,27 @@ def ask_endpoint(req: AskRequest) -> dict:
         return JSONResponse({"error": "refused", "detail": error_message(e)}, status_code=422)
     except LLMError as e:
         raise HTTPException(502, error_message(e))
+
+
+@app.get("/api/papers/{paper_id}/pdf")
+def paper_pdf(paper_id: str, quote: str = Query(default="", max_length=1000),
+              chunk: str = Query(default="", max_length=100)) -> Response:
+    """The paper's PDF, with the quote (or the cited chunk's text) highlighted when it can be found."""
+    c = get_corpus()
+    if paper_id not in c.metas:  # only listed papers: the id never reaches the file system unchecked
+        raise HTTPException(404, "No such paper.")
+    pdf = arxiv.paper_dir(paper_id) / "paper.pdf"
+    if not pdf.is_file():
+        raise HTTPException(404, "This paper's PDF has not been downloaded.")
+    passage = next((ch.text for ch in c.chunks if ch.id == chunk and ch.paper_id == paper_id), "")
+    try:
+        loc = pdflocate.locate(pdf, quote, passage) if quote or passage else None
+        body = pdflocate.highlighted(pdf, loc) if loc else pdf.read_bytes()
+    except Exception:  # an unreadable PDF: serve it as it is and let the viewer cope
+        body = pdf.read_bytes()
+    return Response(body, media_type="application/pdf", headers={
+        "Content-Disposition": f'inline; filename="{paper_id.replace("/", "_")}.pdf"',
+        "X-Content-Type-Options": "nosniff"})
 
 
 @app.get("/")
