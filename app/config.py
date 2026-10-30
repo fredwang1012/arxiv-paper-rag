@@ -16,6 +16,10 @@ class Settings(BaseSettings):
     embed: Literal["auto", "off"] = "auto"
     llm_model: str = "claude-opus-5-5"
     llm_effort: str = "medium"
+    # claim-support check: a second call that grades each cited sentence against its passage
+    verify: bool = True
+    verify_model: str = ""  # empty: the same model as the answers
+    verify_effort: str = "low"
     # declared so a key in .env reaches the SDK: pydantic-settings drops .env entries it has no field for
     anthropic_api_key: SecretStr | None = None
     # arXiv asks for at most one request every 3 seconds.

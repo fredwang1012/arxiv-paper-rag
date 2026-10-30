@@ -11,7 +11,8 @@ from app.answer import Answer, Citation
 from app.chunks import Chunk
 from app.config import settings
 from app.evaluate import Question
-from app.llm import AnthropicLLM, LLMRefusal, LLMTransient, LLMUnavailable, RawAnswer, RawCitation
+from app.llm import (AnthropicLLM, LLMRefusal, LLMTransient, LLMUnavailable, RawAnswer, RawCitation, RawVerdict,
+                     RawVerification)
 from app.retrieval import Hit
 from tests.test_corpus import add_paper, meta
 
@@ -150,6 +151,11 @@ class ScriptedLLM:
         return RawAnswer(answer=f"{passages[0].chunk.text} [1]",
                          citations=[RawCitation(passage=1, quote=passages[0].chunk.text[:20])])
 
+    def verify(self, claims, passages):
+        self.verify_calls = getattr(self, "verify_calls", 0) + 1
+        return RawVerification(verdicts=[RawVerdict(claim=c.number, passage=n, verdict="supported", reason="")
+                                         for c in claims for n in c.passages])
+
 
 QUESTIONS = [
     {"id": "hum", "question": "Why do widgets hum?", "papers": ["1111.0001"], "sections": ["Intro"],
@@ -255,6 +261,8 @@ def _status_error(cls, status):
 def test_rate_limits_and_server_errors_from_the_sdk_are_recorded_and_the_run_goes_on(
         setup, monkeypatch, capsys, error, expected):
     def parse(**kwargs):
+        if kwargs["output_format"] is RawVerification:
+            return SimpleNamespace(stop_reason="end_turn", parsed_output=RawVerification(verdicts=[]))
         if "widgets hum" in kwargs["messages"][0]["content"]:
             raise error
         return SimpleNamespace(stop_reason="end_turn", parsed_output=RawAnswer(
@@ -325,3 +333,32 @@ def test_bad_question_line_names_the_line(tmp_path):
     path.write_text(json.dumps(QUESTIONS[0]) + "\n\n{\"id\": \"x\"}\n", encoding="utf-8")
     with pytest.raises(ValueError, match=r"q.jsonl:3"):
         evaluate.load_questions(path)
+
+
+def test_answers_run_grades_citations_and_no_verify_skips_it(setup, capsys):
+    questions, out = setup
+    llm = ScriptedLLM()
+    assert evaluate.main(["--questions", str(questions), "--answers", "--yes", "--json", str(out)], llm=llm) == 0
+    stdout = capsys.readouterr().out
+    assert "The claim check adds up to 3 more" in stdout and "| Supported | Unsupported |" in stdout
+    answers = json.loads(out.read_text(encoding="utf-8"))["answers"]
+    assert llm.verify_calls == 3 and answers["verify"]["effort"] == settings.verify_effort
+    assert answers["summary"]["support_rate"] == 1.0 and answers["summary"]["claims_graded"] == 3
+    assert all(r["support"] and r["verify_error"] is None for r in answers["questions"])
+
+    llm = ScriptedLLM()
+    assert evaluate.main(["--questions", str(questions), "--answers", "--yes", "--no-verify", "--json", str(out)],
+                         llm=llm) == 0
+    assert "claim check" not in capsys.readouterr().out
+    answers = json.loads(out.read_text(encoding="utf-8"))["answers"]
+    assert not hasattr(llm, "verify_calls") and answers["verify"] is None
+    assert answers["summary"]["support_rate"] is None
+
+
+def test_summarize_answers_rates_verdicts():
+    rows = [{"citation_precision": 1.0, "citation_recall": 1.0, "quotes": 1, "quotes_found": 1, "keyword_hit": 1.0,
+             "cannot_answer": False, "supported": 3, "partial": 1, "unsupported": 0, "verify_error": None},
+            {"citation_precision": 1.0, "citation_recall": 1.0, "quotes": 1, "quotes_found": 1, "keyword_hit": 1.0,
+             "cannot_answer": False, "supported": 0, "partial": 0, "unsupported": 0, "verify_error": "down"}]
+    s = evaluate.summarize_answers(rows)
+    assert (s["claims_graded"], s["support_rate"], s["unsupported_rate"], s["verify_errors"]) == (4, 0.75, 0.0, 1)

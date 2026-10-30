@@ -7,12 +7,12 @@
 <style>
   :root {
     --bg: #fafaf8; --fg: #1d1d1b; --muted: #6b6b66; --card: #ffffff; --border: #dcdcd6;
-    --accent: #2457c5; --on-accent: #ffffff; --warn: #a15c00; --error: #b3261e;
+    --accent: #2457c5; --on-accent: #ffffff; --warn: #a15c00; --error: #b3261e; --ok: #1e7a3c;
   }
   @media (prefers-color-scheme: dark) {
     :root {
       --bg: #151514; --fg: #ece8e8; --muted: #9a9a93; --card: #1f1f1d; --border: #35352f;
-      --accent: #8ab0ff; --on-accent: #101010; --warn: #e0a64a; --error: #ff8a80;
+      --accent: #8ab0ff; --on-accent: #101010; --warn: #e0a64a; --error: #ff8a80; --ok: #7ccf95;
     }
   }
   * { box-sizing: border-box; }
@@ -40,13 +40,19 @@
   .meta { color: var(--muted); }
   blockquote { margin: 6px 0 0; padding-left: 10px; border-left: 3px solid var(--border); }
   .warn { color: var(--warn); }
+  .ok { color: var(--ok); }
+  .bad { color: var(--error); }
+  ul#support { padding-left: 0; list-style: none; margin: 0; }
+  ul#support li { padding: 6px 0; border-bottom: 1px solid var(--border); }
+  ul#support li:last-child { border-bottom: 0; }
   [hidden] { display: none; }
 </style>
 </head>
 <body>
 <main>
   <h1>arXiv paper RAG</h1>
-  <p class="sub">Ask about the CSC2626 Week 5 papers. Every claim cites its paper and section.</p>
+  <p class="sub">Ask about the CSC2626 Week 5 papers. Every claim cites its paper and section, and each citation is
+    checked against the passage it points to.</p>
   <form id="form">
     <textarea id="q" maxlength="1000" required placeholder="How does the NPI core decide when to stop?"></textarea>
     <label class="token">API token (only if the server requires one)
@@ -60,6 +66,10 @@
     <div id="unresolved" class="warn" hidden></div>
     <h2>References</h2>
     <ol id="refs"></ol>
+    <div id="supportBox" hidden>
+      <h2 id="supportHead">Claim check</h2>
+      <ul id="support"></ul>
+    </div>
   </div>
 </main>
 <script>
@@ -111,7 +121,33 @@ function render(data) {
     }
     refs.append(li);
   }
+  renderSupport(data);
   $("result").hidden = false;
+}
+
+const VERDICT = {
+  supported: ["✓", "ok"], partial: ["~", "warn"], unsupported: ["✗", "bad"], unchecked: ["?", "meta"],
+};
+
+function renderSupport(data) {
+  const box = $("supportBox"), list = $("support");
+  list.replaceChildren();
+  box.hidden = !data.verify_error && data.support.length === 0;
+  if (data.verify_error) {
+    $("supportHead").textContent = "Claim check";
+    list.append(el("li", "warn", "The claim check failed: " + data.verify_error));
+    return;
+  }
+  const ok = data.support.filter((s) => s.verdict === "supported").length;
+  $("supportHead").textContent = "Claim check: " + ok + " of " + data.support.length + " citations support their sentence";
+  for (const s of data.support) {
+    const [mark, cls] = VERDICT[s.verdict] || VERDICT.unchecked;
+    const li = el("li");
+    li.append(el("span", cls, mark + " [" + s.passage + "] " + s.verdict + ": "));
+    li.append(el("span", "", s.claim));
+    if (s.reason && s.verdict !== "supported") li.append(el("div", "meta", s.reason));
+    list.append(li);
+  }
 }
 
 // The token lives in sessionStorage only (this tab, never the URL); storage can be blocked, so every access is guarded.

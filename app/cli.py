@@ -8,8 +8,8 @@ import tomllib
 import urllib.error
 
 from app import arxiv, corpus as corpus_mod
-from app.answer import NO_PAPERS, Answer, ask, surname
-from app.config import ROOT
+from app.answer import NO_PAPERS, UNCHECKED, Answer, ask, surname
+from app.config import ROOT, settings
 from app.llm import LLM, AnthropicLLM, LLMError, error_message
 
 READING_LIST = ROOT / "readinglist.toml"
@@ -100,13 +100,35 @@ def format_answer(a: Answer) -> str:
     if a.unmarked_citations:
         marks = ", ".join(f"[{n}]" for n in a.unmarked_citations)
         lines += ["", f"Warning: {marks} cited but never marked in the answer text."]
+    lines += support_lines(a)
     return "\n".join(lines)
+
+
+SUPPORT_MARK = {"supported": "✓", "partial": "~", "unsupported": "✗", UNCHECKED: "?"}
+
+
+def _short(text: str, width: int = 90) -> str:
+    text = " ".join(text.split())
+    return text if len(text) <= width else text[:width - 1] + "…"
+
+
+def support_lines(a: Answer) -> list[str]:
+    if a.verify_error:
+        return ["", f"Claim check failed: {a.verify_error}"]
+    if not a.support:
+        return []
+    ok = sum(s.verdict == "supported" for s in a.support)
+    lines = ["", f"Claim check: {ok} of {len(a.support)} cited passages support their sentence"]
+    for s in a.support:
+        reason = f" ({s.reason})" if s.reason and s.verdict != "supported" else ""
+        lines.append(f"  {SUPPORT_MARK.get(s.verdict, '?')} [{s.passage}] {s.verdict}: {_short(s.claim)}{reason}")
+    return lines
 
 
 def cmd_ask(args, llm: LLM | None = None) -> int:
     c = corpus_mod.build()
     try:
-        a = ask(args.question, c, llm or AnthropicLLM(), args.k)
+        a = ask(args.question, c, llm or AnthropicLLM(), args.k, verify=settings.verify and not args.no_verify)
     except LLMError as e:
         print(error_message(e), file=sys.stderr)
         return 1
@@ -124,6 +146,8 @@ def main(argv: list[str] | None = None, llm: LLM | None = None) -> int:
     p.add_argument("question")
     p.add_argument("-k", type=int, default=8, choices=range(1, 21), metavar="K",
                    help="passages to retrieve, 1 to 20 (default 8)")
+    p.add_argument("--no-verify", action="store_true",
+                   help="skip the claim check (a second model call that grades each citation)")
     p.set_defaults(func=lambda a: cmd_ask(a, llm))
     args = parser.parse_args(argv)
     return args.func(args)

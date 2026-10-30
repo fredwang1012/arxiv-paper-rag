@@ -66,7 +66,8 @@ Hybrid retrieval is scored only when the optional embedder is installed
 (`py -3.12 -m uv sync --extra embed`); otherwise the run says it skipped it.
 
 `--answers` needs `ANTHROPIC_API_KEY` (or an `ant auth login` profile). It prints the number of calls, the model and
-the effort, and asks before spending anything unless `--yes` is given. The JSON is rewritten after every question
+the effort, and asks before spending anything unless `--yes` is given. The claim check adds up to one more call per
+question, at `VERIFY_EFFORT` (default `low`); `--no-verify` skips it. The JSON is rewritten after every question
 (default `data/eval/answers.json`), so an interrupted run keeps what it has. A refusal or a network failure is
 recorded as that question's error and the run goes on; missing credentials stop the run after saving.
 
@@ -87,6 +88,10 @@ Answers (`--answers`, k = 8 passages):
 - **Citation recall**: share of the gold papers that are cited. An answer that says it cannot answer cites nothing
   and so counts as 0.
 - **Quote found**: share of all citations whose quote was found in the cited passage.
+- **Supported / Unsupported** (claim check, on unless `--no-verify`): each sentence of the answer is graded against
+  every passage it marks, by a second model call. Supported is the share of graded (sentence, passage) pairs judged
+  "supported"; Unsupported the share judged "unsupported" (the rest are "partial"). Pairs the check gave no verdict
+  for are left out. A failed check is recorded on the question's row (`verify_error`) and does not make it an error.
 - **Keyword hit**: share of a question's keywords that appear in the answer.
 - **Cannot answer**: share of answers with no citations. The prompt tells the model to cite nothing when the passages
   do not answer the question, so this counts the answers where it said so.

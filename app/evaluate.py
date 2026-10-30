@@ -1,8 +1,9 @@
 """Score retrieval, and optionally cited answers, against the labelled questions in eval/questions.jsonl.
 
-    python -m app.evaluate [--k 1 3 5 8] [--answers [--yes]] [--json out.json] [--questions path]
+    python -m app.evaluate [--k 1 3 5 8] [--answers [--yes] [--no-verify]] [--json out.json] [--questions path]
 
-Retrieval metrics need no LLM. --answers asks the LLM once per question and needs an API key.
+Retrieval metrics need no LLM. --answers asks the LLM once per question, plus once more to grade the citations unless
+--no-verify is given, and needs an API key.
 """
 import argparse
 import json
@@ -144,12 +145,20 @@ def answer_metrics(q: Question, a: Answer) -> dict:
         "keyword_hit": sum(k.lower() in text for k in q.keywords) / len(q.keywords) if q.keywords else None,
         # the prompt tells the model to return no citations when the passages do not answer the question
         "cannot_answer": not a.citations,
+        # claim check: (sentence, passage) pairs graded, by verdict; unchecked pairs are left out
+        **{v: sum(x.verdict == v for x in a.support) for v in VERDICTS},
+        "verify_error": a.verify_error,
     }
+
+
+VERDICTS = ("supported", "partial", "unsupported")
 
 
 def summarize_answers(rows: list[dict]) -> dict:
     ok = [r for r in rows if "error" not in r]
     quotes = sum(r["quotes"] for r in ok)
+    graded = {v: sum(r.get(v, 0) for r in ok) for v in VERDICTS}
+    n_graded = sum(graded.values())
     return {
         "answered": len(ok),
         "errors": len(rows) - len(ok),
@@ -158,19 +167,27 @@ def summarize_answers(rows: list[dict]) -> dict:
         "quote_found_rate": sum(r["quotes_found"] for r in ok) / quotes if quotes else None,
         "keyword_hit_rate": _mean([r["keyword_hit"] for r in ok if r["keyword_hit"] is not None]),
         "cannot_answer_rate": _mean([float(r["cannot_answer"]) for r in ok]),
+        "claims_graded": n_graded,
+        "support_rate": graded["supported"] / n_graded if n_graded else None,
+        "unsupported_rate": graded["unsupported"] / n_graded if n_graded else None,
+        "verify_errors": sum(1 for r in ok if r.get("verify_error")),
     }
 
 
 def answers_eval(questions: list[Question], corpus: corpus_mod.Corpus, llm: LLM,
-                 on_progress: Callable[[dict], None] = lambda result: None) -> dict:
-    """Ask every question; a refusal or transient failure is that question's error. LLMUnavailable propagates."""
+                 on_progress: Callable[[dict], None] = lambda result: None, verify: bool = True) -> dict:
+    """Ask every question; a refusal or transient failure is that question's error. LLMUnavailable propagates.
+
+    With verify, each answer's citations are also graded (a second call); a failed grading is recorded on the row."""
     rows: list[dict] = []
     result = {"model": settings.llm_model, "effort": settings.llm_effort, "k": ANSWER_K,
+              "verify": {"model": settings.verify_model or settings.llm_model, "effort": settings.verify_effort}
+              if verify else None,
               "summary": summarize_answers(rows), "questions": rows}
     on_progress(result)
     for q in questions:
         try:
-            a = ask(q.question, corpus, llm, k=ANSWER_K)
+            a = ask(q.question, corpus, llm, k=ANSWER_K, verify=verify)
         except LLMUnavailable:
             raise
         except LLMError as e:  # LLMTransient, LLMRefusal or a malformed response
@@ -178,7 +195,8 @@ def answers_eval(questions: list[Question], corpus: corpus_mod.Corpus, llm: LLM,
         else:
             row = {"id": q.id, "type": q.type, "answer": a.text, **answer_metrics(q, a),
                    "citations": [{"paper_id": c.paper_id, "section": c.section, "quote": c.quote,
-                                  "quote_found": c.quote_found} for c in a.citations]}
+                                  "quote_found": c.quote_found} for c in a.citations],
+                   "support": [s.__dict__ for s in a.support]}
         rows.append(row)
         result["summary"] = summarize_answers(rows)
         on_progress(result)
@@ -209,11 +227,12 @@ def retrieval_table(results: dict[str, dict], ks: list[int]) -> str:
 def answers_table(result: dict) -> str:
     s = result["summary"]
     return "\n".join([
-        "| Model | Answered | Errors | Citation precision | Citation recall | Quote found | Keyword hit | Cannot answer |",
-        "| --- | --- | --- | --- | --- | --- | --- | --- |",
+        "| Model | Answered | Errors | Citation precision | Citation recall | Quote found | Supported | Unsupported "
+        "| Keyword hit | Cannot answer |",
+        "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
         f"| {result['model']} ({result['effort']}) | {s['answered']} | {s['errors']} | {_fmt(s['citation_precision'])} "
-        f"| {_fmt(s['citation_recall'])} | {_fmt(s['quote_found_rate'])} | {_fmt(s['keyword_hit_rate'])} "
-        f"| {_fmt(s['cannot_answer_rate'])} |",
+        f"| {_fmt(s['citation_recall'])} | {_fmt(s['quote_found_rate'])} | {_fmt(s.get('support_rate'))} "
+        f"| {_fmt(s.get('unsupported_rate'))} | {_fmt(s['keyword_hit_rate'])} | {_fmt(s['cannot_answer_rate'])} |",
     ])
 
 
@@ -244,6 +263,8 @@ def main(argv: list[str] | None = None, llm: LLM | None = None) -> int:
     parser.add_argument("--k", type=int, nargs="+", default=DEFAULT_KS, help="cut-offs for recall@k")
     parser.add_argument("--answers", action="store_true", help="also score LLM answers (one API call per question)")
     parser.add_argument("--yes", action="store_true", help="skip the cost confirmation for --answers")
+    parser.add_argument("--no-verify", action="store_true",
+                        help="with --answers, skip the claim check (one fewer call per question)")
     parser.add_argument("--json", type=Path, help="write per-question detail here")
     parser.add_argument("--questions", type=Path, default=QUESTIONS)
     args = parser.parse_args(argv)
@@ -280,8 +301,12 @@ def main(argv: list[str] | None = None, llm: LLM | None = None) -> int:
     json_path = args.json
     if args.answers:
         json_path = json_path or settings.data_dir / "eval" / "answers.json"
+        verify = settings.verify and not args.no_verify
         print(f"\n--answers makes {len(questions)} LLM calls (one per question) to {settings.llm_model} "
               f"at effort {settings.llm_effort}, each with {ANSWER_K} passages. This costs money.")
+        if verify:
+            print(f"The claim check adds up to {len(questions)} more, to {settings.verify_model or settings.llm_model} "
+                  f"at effort {settings.verify_effort} (skip it with --no-verify).")
         if not args.yes and not _confirm("Continue? [y/N] "):
             print("Cancelled; no LLM calls made.")
             return 1
@@ -292,7 +317,7 @@ def main(argv: list[str] | None = None, llm: LLM | None = None) -> int:
             _write_json(json_path, report)
 
         try:
-            answers_eval(questions, corpus, llm, on_progress=save)
+            answers_eval(questions, corpus, llm, on_progress=save, verify=verify)
         except LLMUnavailable as e:
             report["answers"]["aborted"] = str(e)
             _write_json(json_path, report)
