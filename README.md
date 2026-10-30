@@ -17,6 +17,9 @@ Motion Grammar (Dantam & Stilman) is on the course list but is not on arXiv, so 
 - **Claims are checked.** A second model call grades every cited sentence against each passage it marks:
   supported, partial or unsupported, with a one-line reason. A quote can be in the passage while the sentence
   around it says more than the passage does; this catches that.
+- **Agentic search (optional).** With `--agentic` (or `AGENTIC=true`), the model sees the first results and runs
+  up to 8 follow-up searches of its own, on the whole list or one paper, before the answer is written. Off by default
+  until the comparison numbers are in.
 - **Hybrid search.** BM25 keyword scoring, plus multilingual-e5 embeddings when the `embed` extra is installed.
 - **Three ways in.** A command line, a JSON API and a one-page web UI.
 - **Polite to arXiv.** One request every 3 seconds, a project User-Agent, and everything cached under `data/`, so a
@@ -37,7 +40,7 @@ py -3.12 -m uv run python -m app.cli ask "How does the NPI core decide when to s
 ```
 
 `ask` prints the answer, its references and the claim check; `--no-verify` skips the check (one call instead of
-two). `papers` lists what is downloaded. `fetch`, `index` and `papers` need no API key; only `ask` calls the model. Without
+two), and `--agentic` lets the model search again before answering. `papers` lists what is downloaded. `fetch`, `index` and `papers` need no API key; only `ask` calls the model. Without
 credentials `ask` prints one line saying so and exits with status 1. `fetch` skips papers already saved; if arXiv is
 unreachable or throttling it prints one line and exits with status 1, keeping what was saved.
 
@@ -55,8 +58,9 @@ clients must then send it in the `X-API-Token` header (401 otherwise); the page 
 `sessionStorage` for the tab. Use HTTPS in front of the server, since the token is sent in the clear otherwise.
 
 Open **http://localhost:8000**. `GET /api/papers` lists the papers. `POST /api/ask` takes
-`{"question": "...", "k": 8, "verify": true}` (question 1 to 1000 characters, `k` 1 to 20) and returns
-`{text, references, citations, unresolved_markers, unmarked_citations, support, verify_error}`. `support` has one
+`{"question": "...", "k": 8, "verify": true, "agentic": false}` (question 1 to 1000 characters, `k` 1 to 20;
+`agentic` defaults to the `AGENTIC` setting) and returns
+`{text, references, citations, unresolved_markers, unmarked_citations, support, verify_error, searches}`. `support` has one
 `{claim, passage, verdict, reason}` per cited sentence and passage; if the check itself fails, `verify_error` says
 why and the answer is still returned. With no credentials at all (no
 `ANTHROPIC_API_KEY`, no `ant auth login` profile) or when the API is unreachable it returns 503 with a message. A
@@ -65,7 +69,7 @@ model refusal is 422 with `{"error": "refused", "detail": ...}`, a bad request i
 
 Settings come from the environment or a `.env` file at the repo root; see [.env.example](.env.example). They are
 `ANTHROPIC_API_KEY`, `LLM_MODEL` (default `claude-opus-5-5`), `LLM_EFFORT` (default `medium`), `VERIFY` (default
-`true`), `VERIFY_MODEL` (default: same as `LLM_MODEL`), `VERIFY_EFFORT` (default `low`), `EMBED` (`auto` or `off`),
+`true`), `VERIFY_MODEL` (default: same as `LLM_MODEL`), `VERIFY_EFFORT` (default `low`), `AGENTIC` (default `false`), `AGENT_ROUNDS` (default `3`), `EMBED` (`auto` or `off`),
 `DATA_DIR`, `ARXIV_DELAY_S`, `ALLOWED_HOSTS` and `API_TOKEN`.
 
 ## How it works
@@ -78,12 +82,15 @@ Settings come from the environment or a `.env` file at the repo root; see [.env.
 4. **Search.** Chunks are scored with BM25Plus, scaled by the highest score. With embeddings, a chunk also gets a
    cosine similarity against the query, combined as 0.6 cosine + 0.4 BM25. Without them, a chunk must share a query
    term to count as a hit.
-5. **Answer.** The top passages are numbered and sent to the model with the question. It returns structured output:
+5. **Search again (agentic only).** The model gets the first results and a `search(query, paper?)` tool. For up to
+   `AGENT_ROUNDS` turns it can run follow-up searches (5 passages each, 8 searches at most); new passages join a pool
+   of at most 16, numbered in the order found.
+6. **Answer.** The top passages are numbered and sent to the model with the question. It returns structured output:
    the answer text with `[n]` markers and a quote for each passage it used. The prompt tells it that passages are
    untrusted text and that it must not follow instructions inside them.
-6. **Check quotes.** Each citation is mapped back to its paper and section, and its quote is looked for in that
+7. **Check quotes.** Each citation is mapped back to its paper and section, and its quote is looked for in that
    passage.
-7. **Check claims.** The answer is split into sentences; each sentence with a `[n]` marker is sent with the passages
+8. **Check claims.** The answer is split into sentences; each sentence with a `[n]` marker is sent with the passages
    it marks to a second call, which grades every (sentence, passage) pair as supported, partial or unsupported.
    Passages and the answer are both treated as untrusted text. At most 40 pairs are graded per answer.
 
@@ -147,7 +154,7 @@ Tiers follow the project plan.
 - **Tier 2: better than plain RAG.**
   - [x] LaTeX-source parsing (done in Tier 1)
   - [x] Claim check: each cited passage is graded against the sentence that cites it
-  - [ ] Agentic multi-step retrieval: the model searches again and refines its query
+  - [x] Agentic multi-step retrieval: the model searches again and refines its query (built; not yet measured)
   - [ ] Reranking
   - [ ] Compare against plain RAG and PaperQA2 on the same papers and questions
 - **Tier 3: reader integration.** A citation opens the PDF at the highlighted passage, via semantic-pdf-reader.

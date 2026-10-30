@@ -99,7 +99,7 @@ def test_api_ask(monkeypatch):
     assert r.status_code == 200
     body = r.json()
     assert set(body) == {"text", "references", "citations", "unresolved_markers", "unmarked_citations", "support",
-                         "verify_error"}
+                         "verify_error", "searches"}
     assert body["references"][0]["passages"] == [1] and body["unresolved_markers"] == [2]
     assert body["citations"][0]["quote_found"] is True
     # [2] is marked but not in the model's citations: it is still checked, since passage 2 exists

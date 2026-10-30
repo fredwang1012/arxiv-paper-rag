@@ -3,8 +3,11 @@ optionally check that each cited passage supports the sentence that cites it."""
 import re
 from dataclasses import dataclass, field
 
+from app import agent
+from app.config import settings
 from app.corpus import Corpus
 from app.llm import LLM, ClaimCheck, LLMError, Passage, RawAnswer, RawVerification, error_message
+from app.retrieval import Hit
 
 # [1], [1, 2], [1-3] (hyphen or en dash)
 _MARKER = re.compile(r"\[\s*(\d+(?:\s*[,–-]\s*\d+)*)\s*\]")
@@ -66,6 +69,8 @@ class Answer:
     # one entry per (sentence, passage it marks), in text order; empty when the check was not run
     support: list[Support] = field(default_factory=list)
     verify_error: str | None = None  # why the check failed; the answer itself is still good
+    # follow-up searches the model ran (agentic retrieval only), "<paper id>: <query>" when limited to one paper
+    searches: list[str] = field(default_factory=list)
 
     def references(self) -> list[Reference]:
         """One entry per distinct (paper, section), in the order first cited."""
@@ -166,13 +171,13 @@ def check_support(answer: Answer, llm: LLM) -> None:
     answer.support = map_support(claims, raw)
 
 
+def make_passage(corpus: Corpus, n: int, hit: Hit) -> Passage:
+    meta = corpus.paper(hit.chunk.paper_id)
+    return Passage(n, hit.chunk, meta.title, _surname(meta.authors), meta.year, " > ".join(hit.chunk.section_path))
+
+
 def build_passages(question: str, corpus: Corpus, k: int) -> list[Passage]:
-    passages = []
-    for n, hit in enumerate(corpus.search(question, k), start=1):
-        meta = corpus.paper(hit.chunk.paper_id)
-        passages.append(Passage(n, hit.chunk, meta.title, _surname(meta.authors), meta.year,
-                                " > ".join(hit.chunk.section_path)))
-    return passages
+    return [make_passage(corpus, n, hit) for n, hit in enumerate(corpus.search(question, k), start=1)]
 
 
 def map_citations(raw: RawAnswer, passages: list[Passage], corpus: Corpus) -> list[Citation]:
@@ -187,17 +192,23 @@ def map_citations(raw: RawAnswer, passages: list[Passage], corpus: Corpus) -> li
     return out
 
 
-def ask(question: str, corpus: Corpus, llm: LLM, k: int = 8, verify: bool = False) -> Answer:
+def ask(question: str, corpus: Corpus, llm: LLM, k: int = 8, verify: bool = False, agentic: bool = False) -> Answer:
+    """With agentic, the model may run follow-up searches before answering; the first k passages are the same."""
     if not corpus.chunks:
         return Answer(NO_PAPERS)
-    passages = build_passages(question, corpus, k)
+    searches: list[str] = []
+    if agentic:
+        passages, searches = agent.gather(question, corpus, llm, k, settings.agent_rounds,
+                                          lambda n, hit: make_passage(corpus, n, hit))
+    else:
+        passages = build_passages(question, corpus, k)
     if not passages:
-        return Answer(NOTHING_FOUND)
+        return Answer(NOTHING_FOUND, searches=searches)
     raw = llm.answer(question, passages)
     citations = map_citations(raw, passages, corpus)
     cited = {c.passage for c in citations}
     marked = marker_numbers(raw.answer)
-    answer = Answer(raw.answer, citations, passages, sorted(marked - cited), sorted(cited - marked))
+    answer = Answer(raw.answer, citations, passages, sorted(marked - cited), sorted(cited - marked), searches=searches)
     if verify:
         check_support(answer, llm)
     return answer

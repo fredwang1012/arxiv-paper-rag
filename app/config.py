@@ -20,6 +20,9 @@ class Settings(BaseSettings):
     verify: bool = True
     verify_model: str = ""  # empty: the same model as the answers
     verify_effort: str = "low"
+    # agentic retrieval: the model runs follow-up searches before answering (off by default until measured)
+    agentic: bool = False
+    agent_rounds: int = 3  # model turns that may call the search tool
     # declared so a key in .env reaches the SDK: pydantic-settings drops .env entries it has no field for
     anthropic_api_key: SecretStr | None = None
     # arXiv asks for at most one request every 3 seconds.
