@@ -151,6 +151,10 @@ class ScriptedLLM:
         return RawAnswer(answer=f"{passages[0].chunk.text} [1]",
                          citations=[RawCitation(passage=1, quote=passages[0].chunk.text[:20])])
 
+    def research(self, opening, papers, search, rounds):
+        self.research_calls = getattr(self, "research_calls", 0) + 1
+        search("gradient", None)
+
     def verify(self, claims, passages):
         self.verify_calls = getattr(self, "verify_calls", 0) + 1
         return RawVerification(verdicts=[RawVerdict(claim=c.number, passage=n, verdict="supported", reason="")
@@ -216,10 +220,10 @@ def test_answers_run_scores_each_question(setup, capsys):
     llm = ScriptedLLM()
     assert evaluate.main(["--questions", str(questions), "--answers", "--yes", "--json", str(out)], llm=llm) == 0
     stdout = capsys.readouterr().out
-    assert "makes 3 LLM calls" in stdout and settings.llm_model in stdout
+    assert "plain: 3 calls (one per question)" in stdout and settings.llm_model in stdout
     assert "| Model | Answered | Errors |" in stdout
     assert len(llm.calls) == 3
-    answers = json.loads(out.read_text(encoding="utf-8"))["answers"]
+    answers = json.loads(out.read_text(encoding="utf-8"))["answers"]["plain"]
     assert answers["summary"]["answered"] == 3 and answers["summary"]["errors"] == 0
     assert answers["summary"]["quote_found_rate"] == 1.0
     rows = {r["id"]: r for r in answers["questions"]}
@@ -232,7 +236,7 @@ def test_transient_and_refusal_are_recorded_per_question(setup, capsys):
     questions, out = setup
     llm = ScriptedLLM({"Why do widgets hum?": LLMTransient("timeout"), "How are gears trained?": LLMRefusal("no")})
     assert evaluate.main(["--questions", str(questions), "--answers", "--yes", "--json", str(out)], llm=llm) == 0
-    rows = {r["id"]: r for r in json.loads(out.read_text(encoding="utf-8"))["answers"]["questions"]}
+    rows = {r["id"]: r for r in json.loads(out.read_text(encoding="utf-8"))["answers"]["plain"]["questions"]}
     assert rows["hum"]["error"] == "LLMTransient: timeout"
     assert rows["gears"]["error"] == "LLMRefusal: no"
     assert "error" not in rows["both"]
@@ -244,7 +248,7 @@ def test_unavailable_llm_stops_the_run_and_keeps_partial_results(setup, capsys):
     assert evaluate.main(["--questions", str(questions), "--answers", "--yes", "--json", str(out)], llm=llm) == 2
     assert "No valid Anthropic credentials" in capsys.readouterr().err
     assert llm.calls == ["Why do widgets hum?", "How are gears trained?"]  # stopped: the third is never asked
-    answers = json.loads(out.read_text(encoding="utf-8"))["answers"]
+    answers = json.loads(out.read_text(encoding="utf-8"))["answers"]["plain"]
     assert [r["id"] for r in answers["questions"]] == ["hum"]
     assert answers["aborted"] == "No valid Anthropic credentials"
 
@@ -272,7 +276,7 @@ def test_rate_limits_and_server_errors_from_the_sdk_are_recorded_and_the_run_goe
     questions, out = setup
     assert evaluate.main(["--questions", str(questions), "--answers", "--yes", "--json", str(out)],
                          llm=AnthropicLLM()) == 0
-    answers = json.loads(out.read_text(encoding="utf-8"))["answers"]
+    answers = json.loads(out.read_text(encoding="utf-8"))["answers"]["plain"]
     rows = {r["id"]: r for r in answers["questions"]}
     assert rows["hum"]["error"].startswith(expected)
     assert "error" not in rows["gears"] and "error" not in rows["both"]
@@ -286,7 +290,7 @@ def test_unexpected_exception_aborts_cleanly_and_keeps_partial_results(setup, ca
     captured = capsys.readouterr()
     assert "unexpected KeyError" in captured.err and "secret payload" not in captured.err + captured.out
     assert "| Model | Answered | Errors |" in captured.out  # the partial summary
-    answers = json.loads(out.read_text(encoding="utf-8"))["answers"]
+    answers = json.loads(out.read_text(encoding="utf-8"))["answers"]["plain"]
     assert [r["id"] for r in answers["questions"]] == ["hum"]
     assert answers["aborted"] == "unexpected KeyError"
     assert answers["summary"]["answered"] == 1
@@ -341,7 +345,7 @@ def test_answers_run_grades_citations_and_no_verify_skips_it(setup, capsys):
     assert evaluate.main(["--questions", str(questions), "--answers", "--yes", "--json", str(out)], llm=llm) == 0
     stdout = capsys.readouterr().out
     assert "The claim check adds up to 3 more" in stdout and "| Supported | Unsupported |" in stdout
-    answers = json.loads(out.read_text(encoding="utf-8"))["answers"]
+    answers = json.loads(out.read_text(encoding="utf-8"))["answers"]["plain"]
     assert llm.verify_calls == 3 and answers["verify"]["effort"] == settings.verify_effort
     assert answers["summary"]["support_rate"] == 1.0 and answers["summary"]["claims_graded"] == 3
     assert all(r["support"] and r["verify_error"] is None for r in answers["questions"])
@@ -350,7 +354,7 @@ def test_answers_run_grades_citations_and_no_verify_skips_it(setup, capsys):
     assert evaluate.main(["--questions", str(questions), "--answers", "--yes", "--no-verify", "--json", str(out)],
                          llm=llm) == 0
     assert "claim check" not in capsys.readouterr().out
-    answers = json.loads(out.read_text(encoding="utf-8"))["answers"]
+    answers = json.loads(out.read_text(encoding="utf-8"))["answers"]["plain"]
     assert not hasattr(llm, "verify_calls") and answers["verify"] is None
     assert answers["summary"]["support_rate"] is None
 
@@ -362,3 +366,47 @@ def test_summarize_answers_rates_verdicts():
              "cannot_answer": False, "supported": 0, "partial": 0, "unsupported": 0, "verify_error": "down"}]
     s = evaluate.summarize_answers(rows)
     assert (s["claims_graded"], s["support_rate"], s["unsupported_rate"], s["verify_errors"]) == (4, 0.75, 0.0, 1)
+
+
+def test_systems_are_compared_side_by_side(setup, capsys):
+    questions, out = setup
+    llm = ScriptedLLM()
+    assert evaluate.main(["--questions", str(questions), "--answers", "--yes", "--no-verify", "--systems", "plain",
+                          "agentic", "--json", str(out)], llm=llm) == 0
+    stdout = capsys.readouterr().out
+    assert "agentic: up to 12 calls" in stdout
+    assert "| plain |" in stdout and "| agentic |" in stdout
+    answers = json.loads(out.read_text(encoding="utf-8"))["answers"]
+    assert list(answers) == ["plain", "agentic"]
+    assert answers["agentic"]["system"] == "agentic" and answers["agentic"]["agent_rounds"] == settings.agent_rounds
+    assert llm.research_calls == 3 and len(llm.calls) == 6
+    assert all(r["searches"] == ["gradient"] for r in answers["agentic"]["questions"])
+    assert all(r["searches"] == [] for r in answers["plain"]["questions"])
+
+
+def test_paperqa2_without_the_package_stops_before_spending(setup, capsys, monkeypatch):
+    import importlib.util
+    real = importlib.util.find_spec
+    monkeypatch.setattr(importlib.util, "find_spec", lambda name, *a: None if name == "paperqa" else real(name, *a))
+    questions, out = setup
+    llm = ScriptedLLM()
+    assert evaluate.main(["--questions", str(questions), "--answers", "--yes", "--systems", "paperqa2"], llm=llm) == 1
+    assert "uv run --with paper-qa==" in capsys.readouterr().err and llm.calls == []
+
+
+def test_runner_for_an_injected_system_and_unknown_names(setup):
+    from app import corpus as corpus_mod
+    questions = evaluate.load_questions(setup[0])
+    c = corpus_mod.build()
+    result = evaluate.answers_eval(questions, c, ScriptedLLM(), verify=False, system="paperqa2",
+                                   run=lambda q: Answer("The passages do not say."))
+    assert result["system"] == "paperqa2" and result["summary"]["cannot_answer_rate"] == 1.0
+    with pytest.raises(ValueError):
+        evaluate.system_runner("other", c, ScriptedLLM(), False)
+
+
+def test_empty_quotes_are_left_out_of_the_quote_rate():
+    a = Answer("x [1].", [citation("1111.0001"), citation("1111.0001")])
+    a.citations[1].quote = ""
+    m = evaluate.answer_metrics(q(), a)
+    assert (m["quotes"], m["quotes_found"]) == (1, 1)

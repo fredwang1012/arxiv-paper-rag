@@ -1,11 +1,14 @@
 """Score retrieval, and optionally cited answers, against the labelled questions in eval/questions.jsonl.
 
-    python -m app.evaluate [--k 1 3 5 8] [--answers [--yes] [--no-verify]] [--json out.json] [--questions path]
+    python -m app.evaluate [--k 1 3 5 8] [--answers [--systems plain agentic paperqa2] [--yes] [--no-verify]]
+                           [--json out.json] [--questions path]
 
-Retrieval metrics need no LLM. --answers asks the LLM once per question, plus once more to grade the citations unless
---no-verify is given, and needs an API key.
+Retrieval metrics need no LLM. --answers asks each system every question (plain: one call; agentic: up to
+AGENT_ROUNDS + 1; paperqa2: its own agent), plus one call to grade the citations unless --no-verify is given, and
+needs an API key.
 """
 import argparse
+import importlib.util
 import json
 import logging
 import sys
@@ -15,7 +18,7 @@ from pathlib import Path
 from typing import Callable
 
 from app import corpus as corpus_mod
-from app.answer import Answer, ask
+from app.answer import Answer, ask, check_support
 from app.chunks import search_text
 from app.config import ROOT, settings
 from app.llm import LLM, AnthropicLLM, LLMError, LLMUnavailable
@@ -141,8 +144,8 @@ def answer_metrics(q: Question, a: Answer) -> dict:
         "cited_papers": sorted(cited),
         "citation_precision": len(cited & gold) / len(cited) if cited else None,
         "citation_recall": len(cited & gold) / len(gold),
-        "quotes": len(a.citations),
-        "quotes_found": sum(c.quote_found for c in a.citations),
+        "quotes": sum(1 for c in a.citations if c.quote),  # a system that does not quote (PaperQA2) is left out
+        "quotes_found": sum(c.quote_found for c in a.citations if c.quote),
         "keyword_hit": sum(k.lower() in text for k in q.keywords) / len(q.keywords) if q.keywords else None,
         # the prompt tells the model to return no citations when the passages do not answer the question
         "cannot_answer": not a.citations,
@@ -175,20 +178,43 @@ def summarize_answers(rows: list[dict]) -> dict:
     }
 
 
+SYSTEMS = ("plain", "agentic", "paperqa2")
+
+
+def system_runner(system: str, corpus: corpus_mod.Corpus, llm: LLM, verify: bool) -> Callable[[str], Answer]:
+    """question -> Answer for one of SYSTEMS; the claim check runs the same way for all of them."""
+    if system in ("plain", "agentic"):
+        return lambda question: ask(question, corpus, llm, k=ANSWER_K, verify=verify, agentic=system == "agentic")
+    if system == "paperqa2":
+        from app.paperqa2 import PaperQA2  # needs paper-qa, which only the comparison run installs
+        pqa = PaperQA2(corpus)
+
+        def run(question: str) -> Answer:
+            a = pqa.ask(question)
+            if verify:
+                check_support(a, llm)
+            return a
+        return run
+    raise ValueError(f"unknown system {system!r}")
+
+
 def answers_eval(questions: list[Question], corpus: corpus_mod.Corpus, llm: LLM,
-                 on_progress: Callable[[dict], None] = lambda result: None, verify: bool = True) -> dict:
+                 on_progress: Callable[[dict], None] = lambda result: None, verify: bool = True,
+                 system: str = "plain", run: Callable[[str], Answer] | None = None) -> dict:
     """Ask every question; a refusal or transient failure is that question's error. LLMUnavailable propagates.
 
     With verify, each answer's citations are also graded (a second call); a failed grading is recorded on the row."""
+    run = run or system_runner(system, corpus, llm, verify)
     rows: list[dict] = []
-    result = {"model": settings.llm_model, "effort": settings.llm_effort, "k": ANSWER_K,
+    result = {"system": system, "model": settings.llm_model, "effort": settings.llm_effort, "k": ANSWER_K,
+              "agent_rounds": settings.agent_rounds if system == "agentic" else None,
               "verify": {"model": settings.verify_model or settings.llm_model, "effort": settings.verify_effort}
               if verify else None,
               "summary": summarize_answers(rows), "questions": rows}
     on_progress(result)
     for q in questions:
         try:
-            a = ask(q.question, corpus, llm, k=ANSWER_K, verify=verify)
+            a = run(q.question)
         except LLMUnavailable:
             raise
         except LLMError as e:  # LLMTransient, LLMRefusal or a malformed response
@@ -197,6 +223,7 @@ def answers_eval(questions: list[Question], corpus: corpus_mod.Corpus, llm: LLM,
             row = {"id": q.id, "type": q.type, "answer": a.text, **answer_metrics(q, a),
                    "citations": [{"paper_id": c.paper_id, "section": c.section, "quote": c.quote,
                                   "quote_found": c.quote_found} for c in a.citations],
+                   "searches": a.searches,
                    "support": [s.__dict__ for s in a.support]}
         rows.append(row)
         result["summary"] = summarize_answers(rows)
@@ -225,16 +252,21 @@ def retrieval_table(results: dict[str, dict], ks: list[int]) -> str:
     return "\n".join(lines)
 
 
-def answers_table(result: dict) -> str:
-    s = result["summary"]
-    return "\n".join([
-        "| Model | Answered | Errors | Citation precision | Citation recall | Quote found | Supported | Unsupported "
-        "| Keyword hit | Cannot answer |",
-        "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
-        f"| {result['model']} ({result['effort']}) | {s['answered']} | {s['errors']} | {_fmt(s['citation_precision'])} "
-        f"| {_fmt(s['citation_recall'])} | {_fmt(s['quote_found_rate'])} | {_fmt(s.get('support_rate'))} "
-        f"| {_fmt(s.get('unsupported_rate'))} | {_fmt(s['keyword_hit_rate'])} | {_fmt(s['cannot_answer_rate'])} |",
-    ])
+def answers_table(results: dict[str, dict]) -> str:
+    """One row per system; results maps a system name to its answers_eval result."""
+    lines = [
+        "| System | Model | Answered | Errors | Citation precision | Citation recall | Quote found | Supported "
+        "| Unsupported | Keyword hit | Cannot answer |",
+        "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+    ]
+    for name, result in results.items():
+        s = result["summary"]
+        lines.append(
+            f"| {name} | {result['model']} ({result['effort']}) | {s['answered']} | {s['errors']} "
+            f"| {_fmt(s['citation_precision'])} | {_fmt(s['citation_recall'])} | {_fmt(s['quote_found_rate'])} "
+            f"| {_fmt(s.get('support_rate'))} | {_fmt(s.get('unsupported_rate'))} | {_fmt(s['keyword_hit_rate'])} "
+            f"| {_fmt(s['cannot_answer_rate'])} |")
+    return "\n".join(lines)
 
 
 def _write_json(path: Path, report: dict) -> None:
@@ -264,6 +296,8 @@ def main(argv: list[str] | None = None, llm: LLM | None = None) -> int:
     parser.add_argument("--k", type=int, nargs="+", default=DEFAULT_KS, help="cut-offs for recall@k")
     parser.add_argument("--answers", action="store_true", help="also score LLM answers (one API call per question)")
     parser.add_argument("--yes", action="store_true", help="skip the cost confirmation for --answers")
+    parser.add_argument("--systems", nargs="+", choices=SYSTEMS, default=["plain"],
+                        help="with --answers, the systems to compare (default plain; paperqa2 needs paper-qa)")
     parser.add_argument("--no-verify", action="store_true",
                         help="with --answers, skip the claim check (one fewer call per question)")
     parser.add_argument("--json", type=Path, help="write per-question detail here")
@@ -311,34 +345,52 @@ def main(argv: list[str] | None = None, llm: LLM | None = None) -> int:
     if args.answers:
         json_path = json_path or settings.data_dir / "eval" / "answers.json"
         verify = settings.verify and not args.no_verify
-        print(f"\n--answers makes {len(questions)} LLM calls (one per question) to {settings.llm_model} "
-              f"at effort {settings.llm_effort}, each with {ANSWER_K} passages. This costs money.")
+        systems = list(dict.fromkeys(args.systems))
+        if "paperqa2" in systems and importlib.util.find_spec("paperqa") is None:
+            print("paperqa2 needs paper-qa, which is not installed. Run the comparison with it added:\n"
+                  "  uv run --with paper-qa==2026.8.12 python -m app.evaluate --answers --systems ... ", file=sys.stderr)
+            return 1
+        n = len(questions)
+        print(f"\n--answers asks {n} questions of {', '.join(systems)}, with {settings.llm_model} at effort "
+              f"{settings.llm_effort} ({ANSWER_K} first passages). This costs money:")
+        for system in systems:
+            print(f"  {system}: " + {
+                "plain": f"{n} calls (one per question)",
+                "agentic": f"up to {n * (settings.agent_rounds + 1)} calls ({settings.agent_rounds} search rounds "
+                           f"and the answer, per question)",
+                "paperqa2": f"PaperQA2's own agent decides; typically many calls per question, plus indexing",
+            }[system])
         if verify:
-            print(f"The claim check adds up to {len(questions)} more, to {settings.verify_model or settings.llm_model} "
-                  f"at effort {settings.verify_effort} (skip it with --no-verify).")
+            print(f"The claim check adds up to {n * len(systems)} more, to "
+                  f"{settings.verify_model or settings.llm_model} at effort {settings.verify_effort} "
+                  f"(skip it with --no-verify).")
         if not args.yes and not _confirm("Continue? [y/N] "):
             print("Cancelled; no LLM calls made.")
             return 1
         llm = llm or AnthropicLLM()
+        report["answers"] = {}
 
-        def save(partial: dict) -> None:
-            report["answers"] = partial
-            _write_json(json_path, report)
+        for system in systems:
+            def save(partial: dict, system=system) -> None:
+                report["answers"][system] = partial
+                _write_json(json_path, report)
 
-        try:
-            answers_eval(questions, corpus, llm, on_progress=save, verify=verify)
-        except LLMUnavailable as e:
-            report["answers"]["aborted"] = str(e)
-            _write_json(json_path, report)
-            print(f"\n{e}\nPartial results saved to {json_path}", file=sys.stderr)
-            return 2
-        except Exception as e:  # anything unforeseen: keep what was scored, name the class only (no payloads)
-            report["answers"]["aborted"] = f"unexpected {type(e).__name__}"
-            _write_json(json_path, report)
-            print(f"\nStopped by an unexpected {type(e).__name__}. Partial results so far:\n", file=sys.stderr)
-            print(answers_table(report["answers"]))
-            print(f"\nPartial results saved to {json_path}", file=sys.stderr)
-            return 1
+            try:
+                answers_eval(questions, corpus, llm, on_progress=save, verify=verify, system=system)
+            except LLMUnavailable as e:
+                report["answers"][system]["aborted"] = str(e)
+                _write_json(json_path, report)
+                print(f"\n{e}\nPartial results saved to {json_path}", file=sys.stderr)
+                return 2
+            except Exception as e:  # anything unforeseen: keep what was scored, name the class only (no payloads)
+                if system in report["answers"]:
+                    report["answers"][system]["aborted"] = f"unexpected {type(e).__name__}"
+                _write_json(json_path, report)
+                print(f"\n{system} stopped by an unexpected {type(e).__name__}. Partial results so far:\n",
+                      file=sys.stderr)
+                print(answers_table(report["answers"]))
+                print(f"\nPartial results saved to {json_path}", file=sys.stderr)
+                return 1
         print("\nAnswers:\n")
         print(answers_table(report["answers"]))
 
