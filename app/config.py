@@ -14,6 +14,10 @@ class Settings(BaseSettings):
     data_dir: Path = ROOT / "data"
     # auto: multilingual-e5 embeddings when the "embed" extra is installed, else BM25 only. off: always BM25 only.
     embed: Literal["auto", "off"] = "auto"
+    # auto: rerank the first RERANK_DEPTH candidates with a cross-encoder (needs the "embed" extra). Off until measured.
+    rerank: Literal["auto", "off"] = "off"
+    rerank_model: str = "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1"  # multilingual, like the embedder
+    rerank_depth: int = 30
     llm_model: str = "claude-opus-5-5"
     llm_effort: str = "medium"
     # claim-support check: a second call that grades each cited sentence against its passage

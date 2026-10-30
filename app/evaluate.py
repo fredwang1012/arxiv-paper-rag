@@ -19,6 +19,7 @@ from app.answer import Answer, ask
 from app.chunks import search_text
 from app.config import ROOT, settings
 from app.llm import LLM, AnthropicLLM, LLMError, LLMUnavailable
+from app.reranker import get_reranker
 from app.retrieval import Hit, Index
 
 QUESTIONS = ROOT / "eval" / "questions.jsonl"
@@ -281,11 +282,19 @@ def main(argv: list[str] | None = None, llm: LLM | None = None) -> int:
 
     titles = {pid: m.title for pid, m in corpus.metas.items()}
     bm25 = Index(corpus.chunks, [search_text(c, titles.get(c.paper_id, "")) for c in corpus.chunks])
-    retrievers: dict[str, Search] = {"bm25": bm25.search}
+    indexes = {"bm25": bm25}
     if corpus.index.mode == "hybrid":
-        retrievers["hybrid"] = corpus.search
+        indexes["hybrid"] = corpus.index
     else:
         print("hybrid: skipped, no embedder (install it with `uv sync --extra embed`)")
+    retrievers: dict[str, Search] = {name: index.search for name, index in indexes.items()}  # first stage only
+    reranker = get_reranker(force=True)  # scored whatever RERANK says, so the comparison is there before turning it on
+    if reranker is not None:
+        for name, index in indexes.items():
+            retrievers[f"{name}+rerank"] = (lambda query, k, index=index:
+                                            index.reranked(query, k, reranker, settings.rerank_depth))
+    else:
+        print(f"rerank: skipped, {settings.rerank_model} could not be loaded (needs the embed extra)")
 
     results = {name: retrieval_eval(questions, search, ks) for name, search in retrievers.items()}
     report: dict = {"date": datetime.now().astimezone().isoformat(timespec="seconds"),

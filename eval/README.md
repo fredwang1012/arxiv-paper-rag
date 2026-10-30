@@ -63,7 +63,9 @@ py -3.12 -m uv run python -m app.evaluate --answers --yes --json out.json
 ```
 
 Hybrid retrieval is scored only when the optional embedder is installed
-(`py -3.12 -m uv sync --extra embed`); otherwise the run says it skipped it.
+(`py -3.12 -m uv sync --extra embed`); otherwise the run says it skipped it. With the same extra, each retriever also
+gets a `+rerank` row: its top `RERANK_DEPTH` (30) hits reordered by the cross-encoder `RERANK_MODEL`. These rows are
+scored whatever `RERANK` is set to, so the comparison exists before reranking is turned on.
 
 `--answers` needs `ANTHROPIC_API_KEY` (or an `ant auth login` profile). It prints the number of calls, the model and
 the effort, and asks before spending anything unless `--yes` is given. The claim check adds up to one more call per
