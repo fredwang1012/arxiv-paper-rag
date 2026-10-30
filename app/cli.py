@@ -84,6 +84,8 @@ def _authors(authors: list[str]) -> str:
 
 def format_answer(a: Answer) -> str:
     lines = [a.text]
+    if a.searches:
+        lines += ["", "Searches: " + "; ".join(a.searches)]
     refs = a.references()
     if refs:
         lines += ["", "References"]
@@ -128,7 +130,8 @@ def support_lines(a: Answer) -> list[str]:
 def cmd_ask(args, llm: LLM | None = None) -> int:
     c = corpus_mod.build()
     try:
-        a = ask(args.question, c, llm or AnthropicLLM(), args.k, verify=settings.verify and not args.no_verify)
+        a = ask(args.question, c, llm or AnthropicLLM(), args.k, verify=settings.verify and not args.no_verify,
+                agentic=settings.agentic or args.agentic)
     except LLMError as e:
         print(error_message(e), file=sys.stderr)
         return 1
@@ -146,6 +149,8 @@ def main(argv: list[str] | None = None, llm: LLM | None = None) -> int:
     p.add_argument("question")
     p.add_argument("-k", type=int, default=8, choices=range(1, 21), metavar="K",
                    help="passages to retrieve, 1 to 20 (default 8)")
+    p.add_argument("--agentic", action="store_true",
+                   help="let the model run follow-up searches before answering (more calls; on when AGENTIC=true)")
     p.add_argument("--no-verify", action="store_true",
                    help="skip the claim check (a second model call that grades each citation)")
     p.set_defaults(func=lambda a: cmd_ask(a, llm))

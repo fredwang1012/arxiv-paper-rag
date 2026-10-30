@@ -30,6 +30,7 @@
   button:disabled { opacity: .6; cursor: default; }
   #status { margin: 16px 0; color: var(--muted); }
   #status.error { color: var(--error); }
+  #searches { margin-top: 8px; font-size: .9rem; }
   #answer { white-space: pre-wrap; background: var(--card); border: 1px solid var(--border);
     border-radius: 6px; padding: 12px 14px; }
   h2 { font-size: 1.05rem; margin: 24px 0 8px; }
@@ -58,11 +59,14 @@
     <label class="token">API token (only if the server requires one)
       <input id="token" type="password" autocomplete="off" spellcheck="false">
     </label>
+    <label class="token"><input id="agentic" type="checkbox"> Search in several steps (slower; the model runs
+      follow-up searches before answering)</label>
     <button id="go" type="submit">Ask</button>
   </form>
   <div id="status" role="status"></div>
   <div id="result" hidden>
     <div id="answer"></div>
+    <div id="searches" class="meta" hidden></div>
     <div id="unresolved" class="warn" hidden></div>
     <h2>References</h2>
     <ol id="refs"></ol>
@@ -103,6 +107,8 @@ function authorsOf(list) {
 
 function render(data) {
   $("answer").textContent = data.text;
+  $("searches").hidden = data.searches.length === 0;
+  $("searches").textContent = "Searches: " + data.searches.join("; ");
   const un = $("unresolved");
   un.hidden = data.unresolved_markers.length === 0;
   un.textContent = un.hidden ? "" : "Warning: the answer uses " +
@@ -170,7 +176,7 @@ $("form").addEventListener("submit", async (ev) => {
   try {
     const res = await fetch("/api/ask", {
       method: "POST", headers,
-      body: JSON.stringify({ question }),
+      body: JSON.stringify({ question, agentic: $("agentic").checked }),
     });
     const body = await res.json().catch(() => ({}));
     if (!res.ok) {

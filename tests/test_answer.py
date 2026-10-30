@@ -24,6 +24,11 @@ class FakeLLM:
         self.calls.append((question, passages))
         return self.raw
 
+    def research(self, opening, papers, search, rounds):
+        """Runs the scripted (query, paper) searches, all in the first round."""
+        self.research_calls = getattr(self, "research_calls", []) + [(opening, papers, rounds)]
+        self.search_results = [search(q, paper) for q, paper in getattr(self, "searches", [])]
+
     def verify(self, claims, passages):
         self.verify_calls.append((claims, passages))
         if isinstance(self.verification, Exception):
