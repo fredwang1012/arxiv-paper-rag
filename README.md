@@ -85,8 +85,10 @@ data/       downloaded papers and the index (gitignored)
 
 ## Evaluation
 
-`app/evaluate.py` scores retrieval on 32 hand-labelled questions about the five papers, with no model call. Section
-recall counts a hit when its own section title contains a gold substring for that hit's paper. Setup, metrics and how
+`app/evaluate.py` scores retrieval on 32 questions about the five papers, with no model call. The questions and their
+gold section labels were drafted from the parsed paper text and checked by script; nobody who knows the papers has
+reviewed them yet, so treat the numbers as provisional. Section recall counts a hit when its own section title
+contains a gold substring for that hit's paper. Setup, metrics and how
 the labels changed are in [eval/README.md](eval/README.md).
 
 ```bash
