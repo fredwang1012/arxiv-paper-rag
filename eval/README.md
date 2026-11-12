@@ -60,13 +60,29 @@ py -3.12 -m uv run python -m app.evaluate                       # retrieval only
 py -3.12 -m uv run python -m app.evaluate --k 1 3 5 8 --json out.json
 py -3.12 -m uv run python -m app.evaluate --answers              # one LLM call per question, asks first
 py -3.12 -m uv run python -m app.evaluate --answers --yes --json out.json
+py -3.12 -m uv run python -m app.evaluate --answers --systems plain agentic          # compare two systems
+py -3.12 -m uv run --with paper-qa==2026.8.12 python -m app.evaluate --answers --systems plain agentic paperqa2
 ```
 
+`--systems` picks what answers the questions; the answers JSON then holds one result per system, and the table one
+row per system:
+
+- `plain`: one search on the question, then the answer (the default).
+- `agentic`: the same first search, then up to `AGENT_ROUNDS` turns of follow-up searches chosen by the model.
+- `paperqa2`: [PaperQA2](https://github.com/Future-House/paper-qa)'s own agent over the same PDFs, with the same
+  model (through LiteLLM), the same multilingual-e5 embedder and a local manifest, so it looks nothing up online. Its
+  answer cites contexts by id; those become numbered passages and `[n]` markers, so citation precision and recall,
+  keyword hits and the claim check are computed the same way. PaperQA2 does not quote, so its quote-found rate is
+  n/a. paper-qa is not a project dependency: `uv run --with` adds it for that run only.
+
 Hybrid retrieval is scored only when the optional embedder is installed
-(`py -3.12 -m uv sync --extra embed`); otherwise the run says it skipped it.
+(`py -3.12 -m uv sync --extra embed`); otherwise the run says it skipped it. With the same extra, each retriever also
+gets a `+rerank` row: its top `RERANK_DEPTH` (30) hits reordered by the cross-encoder `RERANK_MODEL`. These rows are
+scored whatever `RERANK` is set to, so the comparison exists before reranking is turned on.
 
 `--answers` needs `ANTHROPIC_API_KEY` (or an `ant auth login` profile). It prints the number of calls, the model and
-the effort, and asks before spending anything unless `--yes` is given. The JSON is rewritten after every question
+the effort, and asks before spending anything unless `--yes` is given. The claim check adds up to one more call per
+question, at `VERIFY_EFFORT` (default `low`); `--no-verify` skips it. The JSON is rewritten after every question
 (default `data/eval/answers.json`), so an interrupted run keeps what it has. A refusal or a network failure is
 recorded as that question's error and the run goes on; missing credentials stop the run after saving.
 
@@ -87,6 +103,10 @@ Answers (`--answers`, k = 8 passages):
 - **Citation recall**: share of the gold papers that are cited. An answer that says it cannot answer cites nothing
   and so counts as 0.
 - **Quote found**: share of all citations whose quote was found in the cited passage.
+- **Supported / Unsupported** (claim check, on unless `--no-verify`): each sentence of the answer is graded against
+  every passage it marks, by a second model call. Supported is the share of graded (sentence, passage) pairs judged
+  "supported"; Unsupported the share judged "unsupported" (the rest are "partial"). Pairs the check gave no verdict
+  for are left out. A failed check is recorded on the question's row (`verify_error`) and does not make it an error.
 - **Keyword hit**: share of a question's keywords that appear in the answer.
 - **Cannot answer**: share of answers with no citations. The prompt tells the model to cite nothing when the passages
   do not answer the question, so this counts the answers where it said so.

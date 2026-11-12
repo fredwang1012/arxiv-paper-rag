@@ -3,17 +3,19 @@ import secrets
 import threading
 from pathlib import Path
 
-from fastapi import Depends, FastAPI, Header, HTTPException, Request
+from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, Response
 from pydantic import BaseModel, Field
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
+from app import arxiv, pdflocate
 from app import corpus as corpus_mod
 from app.answer import Answer, ask
 from app.config import settings
 from app.corpus import Corpus
 from app.llm import LLM, AnthropicLLM, LLMError, LLMRefusal, LLMTransient, LLMUnavailable, error_message
+from app.ratelimit import RateLimiter
 
 STATIC = Path(__file__).parent / "static"
 
@@ -38,6 +40,17 @@ app.add_middleware(_SettingsHosts)
 _lock = threading.Lock()
 _corpus: Corpus | None = None
 _llm: LLM | None = None
+_limiter: RateLimiter | None = None
+
+
+def get_limiter() -> RateLimiter:
+    """Rebuilt when the limits change (tests and settings reloads), keeping counts otherwise."""
+    global _limiter
+    with _lock:
+        limits = (settings.ask_limit_per_hour, settings.ask_limit_per_day)
+        if _limiter is None or (_limiter.per_client_hour, _limiter.per_day) != limits:
+            _limiter = RateLimiter(*limits)
+        return _limiter
 
 
 def get_corpus() -> Corpus:
@@ -60,6 +73,8 @@ def get_llm() -> LLM:
 class AskRequest(BaseModel):
     question: str = Field(min_length=1, max_length=1000)
     k: int = Field(default=8, ge=1, le=20)
+    verify: bool = True  # also check each citation supports its sentence (a second model call; off when VERIFY=false)
+    agentic: bool | None = None  # follow-up searches before answering; None uses the AGENTIC setting
 
 
 def answer_json(a: Answer) -> dict:
@@ -69,6 +84,9 @@ def answer_json(a: Answer) -> dict:
         "citations": [c.__dict__ for c in a.citations],
         "unresolved_markers": a.unresolved_markers,
         "unmarked_citations": a.unmarked_citations,
+        "support": [s.__dict__ for s in a.support],
+        "verify_error": a.verify_error,
+        "searches": a.searches,
     }
 
 
@@ -112,12 +130,19 @@ def guard_ask(request: Request, x_api_token: str | None = Header(default=None)) 
         expected = settings.api_token.get_secret_value().encode()
         if x_api_token is None or not secrets.compare_digest(x_api_token.encode(), expected):
             raise HTTPException(401, "A valid X-API-Token header is required.")
+    if settings.ask_limit_per_hour or settings.ask_limit_per_day:
+        wait = get_limiter().check(request.client.host if request.client else "unknown")
+        if wait is not None:
+            raise HTTPException(429, "Too many questions; try again later.",
+                                headers={"Retry-After": str(max(1, int(wait) + 1))})
 
 
 @app.post("/api/ask", dependencies=[Depends(guard_ask)])
 def ask_endpoint(req: AskRequest) -> dict:
     try:
-        return answer_json(ask(req.question, get_corpus(), get_llm(), req.k))
+        agentic = settings.agentic if req.agentic is None else req.agentic
+        return answer_json(ask(req.question, get_corpus(), get_llm(), req.k, verify=settings.verify and req.verify,
+                               agentic=agentic))
     except LLMUnavailable as e:
         raise HTTPException(503, error_message(e))
     except LLMTransient as e:
@@ -126,6 +151,27 @@ def ask_endpoint(req: AskRequest) -> dict:
         return JSONResponse({"error": "refused", "detail": error_message(e)}, status_code=422)
     except LLMError as e:
         raise HTTPException(502, error_message(e))
+
+
+@app.get("/api/papers/{paper_id}/pdf")
+def paper_pdf(paper_id: str, quote: str = Query(default="", max_length=1000),
+              chunk: str = Query(default="", max_length=100)) -> Response:
+    """The paper's PDF, with the quote (or the cited chunk's text) highlighted when it can be found."""
+    c = get_corpus()
+    if paper_id not in c.metas:  # only listed papers: the id never reaches the file system unchecked
+        raise HTTPException(404, "No such paper.")
+    pdf = arxiv.paper_dir(paper_id) / "paper.pdf"
+    if not pdf.is_file():
+        raise HTTPException(404, "This paper's PDF has not been downloaded.")
+    passage = next((ch.text for ch in c.chunks if ch.id == chunk and ch.paper_id == paper_id), "")
+    try:
+        loc = pdflocate.locate(pdf, quote, passage) if quote or passage else None
+        body = pdflocate.highlighted(pdf, loc) if loc else pdf.read_bytes()
+    except Exception:  # an unreadable PDF: serve it as it is and let the viewer cope
+        body = pdf.read_bytes()
+    return Response(body, media_type="application/pdf", headers={
+        "Content-Disposition": f'inline; filename="{paper_id.replace("/", "_")}.pdf"',
+        "X-Content-Type-Options": "nosniff"})
 
 
 @app.get("/")

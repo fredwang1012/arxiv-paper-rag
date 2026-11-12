@@ -10,6 +10,7 @@ from app.arxiv import PaperMeta
 from app.chunks import Chunk, chunk_sections, search_text
 from app.config import settings
 from app.embedder import get_embedder
+from app.reranker import get_reranker
 from app.retrieval import DEFAULT_K, Hit, Index
 from app.sections import load_sections
 
@@ -27,8 +28,12 @@ class Corpus:
     def chunks(self) -> list[Chunk]:
         return self.index.chunks
 
-    def search(self, query: str, k: int = DEFAULT_K) -> list[Hit]:
-        return self.index.search(query, k)
+    def search(self, query: str, k: int = DEFAULT_K, paper: str | None = None) -> list[Hit]:
+        """Top k chunks (from one paper when given), reranked when RERANK=auto and the reranker loads."""
+        reranker = get_reranker()
+        if reranker is None:
+            return self.index.search(query, k, paper)
+        return self.index.reranked(query, k, reranker, settings.rerank_depth, paper)
 
     def paper(self, paper_id: str) -> PaperMeta:
         return self.metas[paper_id]

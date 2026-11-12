@@ -7,12 +7,12 @@
 <style>
   :root {
     --bg: #fafaf8; --fg: #1d1d1b; --muted: #6b6b66; --card: #ffffff; --border: #dcdcd6;
-    --accent: #2457c5; --on-accent: #ffffff; --warn: #a15c00; --error: #b3261e;
+    --accent: #2457c5; --on-accent: #ffffff; --warn: #a15c00; --error: #b3261e; --ok: #1e7a3c;
   }
   @media (prefers-color-scheme: dark) {
     :root {
       --bg: #151514; --fg: #ece8e8; --muted: #9a9a93; --card: #1f1f1d; --border: #35352f;
-      --accent: #8ab0ff; --on-accent: #101010; --warn: #e0a64a; --error: #ff8a80;
+      --accent: #8ab0ff; --on-accent: #101010; --warn: #e0a64a; --error: #ff8a80; --ok: #7ccf95;
     }
   }
   * { box-sizing: border-box; }
@@ -30,6 +30,7 @@
   button:disabled { opacity: .6; cursor: default; }
   #status { margin: 16px 0; color: var(--muted); }
   #status.error { color: var(--error); }
+  #searches { margin-top: 8px; font-size: .9rem; }
   #answer { white-space: pre-wrap; background: var(--card); border: 1px solid var(--border);
     border-radius: 6px; padding: 12px 14px; }
   h2 { font-size: 1.05rem; margin: 24px 0 8px; }
@@ -40,26 +41,40 @@
   .meta { color: var(--muted); }
   blockquote { margin: 6px 0 0; padding-left: 10px; border-left: 3px solid var(--border); }
   .warn { color: var(--warn); }
+  a.pdf { display: inline-block; margin-top: 6px; color: var(--accent); font-size: .9rem; }
+  .ok { color: var(--ok); }
+  .bad { color: var(--error); }
+  ul#support { padding-left: 0; list-style: none; margin: 0; }
+  ul#support li { padding: 6px 0; border-bottom: 1px solid var(--border); }
+  ul#support li:last-child { border-bottom: 0; }
   [hidden] { display: none; }
 </style>
 </head>
 <body>
 <main>
   <h1>arXiv paper RAG</h1>
-  <p class="sub">Ask about the CSC2626 Week 5 papers. Every claim cites its paper and section.</p>
+  <p class="sub">Ask about the CSC2626 Week 5 papers. Every claim cites its paper and section, and each citation is
+    checked against the passage it points to.</p>
   <form id="form">
     <textarea id="q" maxlength="1000" required placeholder="How does the NPI core decide when to stop?"></textarea>
     <label class="token">API token (only if the server requires one)
       <input id="token" type="password" autocomplete="off" spellcheck="false">
     </label>
+    <label class="token"><input id="agentic" type="checkbox"> Search in several steps (slower; the model runs
+      follow-up searches before answering)</label>
     <button id="go" type="submit">Ask</button>
   </form>
   <div id="status" role="status"></div>
   <div id="result" hidden>
     <div id="answer"></div>
+    <div id="searches" class="meta" hidden></div>
     <div id="unresolved" class="warn" hidden></div>
     <h2>References</h2>
     <ol id="refs"></ol>
+    <div id="supportBox" hidden>
+      <h2 id="supportHead">Claim check</h2>
+      <ul id="support"></ul>
+    </div>
   </div>
 </main>
 <script>
@@ -91,8 +106,21 @@ function authorsOf(list) {
   return names.length === 2 ? names[0] + " & " + names[1] : names[0] + " et al.";
 }
 
+// Opens the PDF at the cited page with the passage highlighted; without a known page it opens at the start.
+function pdfLink(cit) {
+  const params = new URLSearchParams({ quote: cit.quote || "", chunk: cit.chunk_id });
+  const a = el("a", "pdf", cit.pdf_page ? "Open PDF at p. " + cit.pdf_page : "Open PDF");
+  a.href = "/api/papers/" + encodeURIComponent(cit.paper_id) + "/pdf?" + params.toString() +
+    (cit.pdf_page ? "#page=" + cit.pdf_page : "");
+  a.target = "_blank";
+  a.rel = "noopener";
+  return a;
+}
+
 function render(data) {
   $("answer").textContent = data.text;
+  $("searches").hidden = data.searches.length === 0;
+  $("searches").textContent = "Searches: " + data.searches.join("; ");
   const un = $("unresolved");
   un.hidden = data.unresolved_markers.length === 0;
   un.textContent = un.hidden ? "" : "Warning: the answer uses " +
@@ -109,9 +137,36 @@ function render(data) {
       if (!cit.quote_found) q.append(el("span", "warn", " ⚠ quote not found in the passage"));
       li.append(q);
     }
+    if (cit) li.append(pdfLink(cit));
     refs.append(li);
   }
+  renderSupport(data);
   $("result").hidden = false;
+}
+
+const VERDICT = {
+  supported: ["✓", "ok"], partial: ["~", "warn"], unsupported: ["✗", "bad"], unchecked: ["?", "meta"],
+};
+
+function renderSupport(data) {
+  const box = $("supportBox"), list = $("support");
+  list.replaceChildren();
+  box.hidden = !data.verify_error && data.support.length === 0;
+  if (data.verify_error) {
+    $("supportHead").textContent = "Claim check";
+    list.append(el("li", "warn", "The claim check failed: " + data.verify_error));
+    return;
+  }
+  const ok = data.support.filter((s) => s.verdict === "supported").length;
+  $("supportHead").textContent = "Claim check: " + ok + " of " + data.support.length + " citations support their sentence";
+  for (const s of data.support) {
+    const [mark, cls] = VERDICT[s.verdict] || VERDICT.unchecked;
+    const li = el("li");
+    li.append(el("span", cls, mark + " [" + s.passage + "] " + s.verdict + ": "));
+    li.append(el("span", "", s.claim));
+    if (s.reason && s.verdict !== "supported") li.append(el("div", "meta", s.reason));
+    list.append(li);
+  }
 }
 
 // The token lives in sessionStorage only (this tab, never the URL); storage can be blocked, so every access is guarded.
@@ -134,7 +189,7 @@ $("form").addEventListener("submit", async (ev) => {
   try {
     const res = await fetch("/api/ask", {
       method: "POST", headers,
-      body: JSON.stringify({ question }),
+      body: JSON.stringify({ question, agentic: $("agentic").checked }),
     });
     const body = await res.json().catch(() => ({}));
     if (!res.ok) {

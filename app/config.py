@@ -14,8 +14,19 @@ class Settings(BaseSettings):
     data_dir: Path = ROOT / "data"
     # auto: multilingual-e5 embeddings when the "embed" extra is installed, else BM25 only. off: always BM25 only.
     embed: Literal["auto", "off"] = "auto"
+    # auto: rerank the first RERANK_DEPTH candidates with a cross-encoder (needs the "embed" extra). Off until measured.
+    rerank: Literal["auto", "off"] = "off"
+    rerank_model: str = "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1"  # multilingual, like the embedder
+    rerank_depth: int = 30
     llm_model: str = "claude-opus-5-5"
     llm_effort: str = "medium"
+    # claim-support check: a second call that grades each cited sentence against its passage
+    verify: bool = True
+    verify_model: str = ""  # empty: the same model as the answers
+    verify_effort: str = "low"
+    # agentic retrieval: the model runs follow-up searches before answering (off by default until measured)
+    agentic: bool = False
+    agent_rounds: int = 3  # model turns that may call the search tool
     # declared so a key in .env reaches the SDK: pydantic-settings drops .env entries it has no field for
     anthropic_api_key: SecretStr | None = None
     # arXiv asks for at most one request every 3 seconds.
@@ -25,6 +36,9 @@ class Settings(BaseSettings):
     allowed_hosts: Annotated[list[str], NoDecode] = ["localhost", "127.0.0.1", "[::1]"]
     # when set, POST /api/ask needs this value in the X-API-Token header
     api_token: SecretStr | None = None
+    # spend limits for POST /api/ask (0 = no limit): questions per client address per hour, and per day in total
+    ask_limit_per_hour: int = 0
+    ask_limit_per_day: int = 0
 
     @field_validator("allowed_hosts", mode="before")
     @classmethod
